@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+  supateam-database-mongo:
+    image: mongo:5-focal
+    container_name: supateam-database-mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: supateam
+      MONGO_INITDB_ROOT_PASSWORD: supateam
+      MONGO_INITDB_DATABASE: supateam
+    volumes:
+      - supateam-mongo-data:/data/db
+
+volumes:
+  supateam-mongo-data:

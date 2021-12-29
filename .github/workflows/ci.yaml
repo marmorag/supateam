@@ -13,6 +13,7 @@ jobs:
       tag: ${{ steps.new_tag.outputs.next_version }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: generate tag for new version
         id: new_tag
         uses: haya14busa/action-bumpr@v1

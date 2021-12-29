@@ -9,6 +9,8 @@ env:
 
 jobs:
   release:
+    outputs:
+      tag: ${{ steps.new_tag.outputs.next_version }}
     runs-on: ubuntu-latest
     steps:
       - name: generate tag for new version
@@ -53,7 +55,7 @@ jobs:
           context: ${{ matrix.service.directory }}
           push: true
           tags: |
-            ghcr.io/marmorag/supateam-${{ matrix.service.name }}:${{ steps.new_tag.outputs.next_version }}
+            ghcr.io/marmorag/supateam-${{ matrix.service.name }}:${{ needs.release.outputs.tag }}
             ghcr.io/marmorag/supateam-${{ matrix.service.name }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max

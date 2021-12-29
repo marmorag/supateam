@@ -2,7 +2,8 @@ FROM node:14 as app-builder
 WORKDIR /app
 
 COPY . .
-RUN yarn && \
+RUN cd packages/front && \
+    yarn && \
     yarn build
 
 FROM alpine:3.13.2 AS thttpd-builder
@@ -23,7 +24,7 @@ COPY --from=thttpd-builder /etc/passwd /etc/passwd
 COPY --from=thttpd-builder /thttpd/thttpd /bin/thttpd
 
 USER static-user
-COPY --from=app-builder /app/dist /static
+COPY --from=app-builder /app/packages/front/dist /static
 
 EXPOSE 8000
 ENTRYPOINT ["/bin/thttpd"]

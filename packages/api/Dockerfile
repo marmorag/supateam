@@ -8,12 +8,14 @@ RUN apk --update add ca-certificates make git
 RUN mkdir -p /app
 WORKDIR /app
 
-COPY . .
-RUN TARGETOS=${TARGETOS} TARGETARCH=${TARGETARCH} CGO_ENABLED=0 make build
+COPY ../../. ./
+RUN cd packages/api && \
+    make setup && \
+    TARGETOS=${TARGETOS} TARGETARCH=${TARGETARCH} CGO_ENABLED=0 make build
 
 FROM scratch
 
-COPY --from=builder /app/supateam /supateam
+COPY --from=builder /app/packages/api/supateam /supateam
 
 ENTRYPOINT ["/supateam"]
 CMD ["serve"]

@@ -21,7 +21,7 @@
         </v-col>
       </v-row>
     </v-col>
-    <v-col md="3" sm="8" offset-sm="2">
+    <v-col md="3" sm="8">
       <EventList :events="events" :participations="participations" :month="currentMonth" :year="currentYear" @participation:refresh="syncParticipation" />
     </v-col>
   </v-row>

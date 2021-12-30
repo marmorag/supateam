@@ -32,7 +32,7 @@ func CloseConnection() {
 func getMongoConnection() (*mongo.Client, error) {
 	config := internal.GetConfig()
 	ctx := context.Background()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%s@%s:%d", config.DbUser, config.DbPass, config.DbHost, config.DbPort)))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%s@%s:%d/%s?authSource=admin", config.DbUser, config.DbPass, config.DbHost, config.DbPort, config.DbName)))
 
 	if err != nil {
 		log.Fatal(err)

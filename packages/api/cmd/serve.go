@@ -2,6 +2,7 @@ package cmd
 
 import (
 	swagger "github.com/arsmn/fiber-swagger/v2"
+	"github.com/getsentry/sentry-go"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -16,6 +17,17 @@ import (
 
 func executeServeCommand() {
 	config := internal.GetConfig()
+
+	if config.ApplicationEnvironment == "prod" {
+		err := sentry.Init(sentry.ClientOptions{
+			Environment: "prod",
+			Dsn:         "https://90dc370dbd474422bdf2394c51e0d65e@o473284.ingest.sentry.io/6129025",
+		})
+		if err != nil {
+			log.Fatalf("sentry.Init: %s", err)
+		}
+	}
+
 	handlers := []routes.RouteHandler{
 		routes.AuthRouteHandler{},
 		routes.HealthcheckRouteHandler{},

@@ -20,6 +20,7 @@ type Configuration struct {
 	CorsAllowMethods string
 	// App configuration
 	ApplicationSecret        string
+	ApplicationEnvironment   string
 	ApplicationPrefork       bool
 	ApplicationName          string
 	ApplicationAESPassphrase string
@@ -50,6 +51,7 @@ func InitConfig() {
 		CorsAllowHeaders:         getEnv("CORS_ALLOW_HEADERS", ""),
 		CorsAllowMethods:         getEnv("CORS_ALLOW_METHODS", "GET,POST,HEAD,PUT,DELETE,OPTIONS"),
 		ApplicationSecret:        getEnv("APP_SECRET", ""),
+		ApplicationEnvironment:   getEnv("APP_ENV", "dev"),
 		ApplicationPrefork:       getEnvBool("APP_PREFORK", false),
 		ApplicationName:          getEnv("APP_NAME", "SupaTeam"),
 		ApplicationAESPassphrase: getEnv("APP_AES_PASSPHRASE", ""),

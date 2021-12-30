@@ -14,6 +14,7 @@ const app = createApp(App);
 if (import.meta.env.PROD) {
   Sentry.init({
     app,
+    environment: "production",
     dsn: "https://ed98515495174d489e951f8f1f1246cc@o473284.ingest.sentry.io/6129020",
     integrations: [
       new Integrations.BrowserTracing({

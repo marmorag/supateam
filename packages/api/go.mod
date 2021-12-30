@@ -6,6 +6,7 @@ require (
 	github.com/JDR-ynovant/api v0.0.0-20210624205158-8b6961d23669
 	github.com/arsmn/fiber-swagger/v2 v2.20.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+	github.com/getsentry/sentry-go v0.12.0 // indirect
 	github.com/go-playground/validator v9.31.0+incompatible // indirect
 	github.com/gofiber/fiber/v2 v2.21.0
 	github.com/gofiber/jwt/v2 v2.2.7 // indirect

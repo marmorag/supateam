@@ -18,7 +18,7 @@ if (import.meta.env.PROD) {
     integrations: [
       new Integrations.BrowserTracing({
         routingInstrumentation: Sentry.vueRouterInstrumentation(router),
-        tracingOrigins: ["localhost", "my-site-url.com", /^\//],
+        tracingOrigins: ["supateam.marmog.cloud", /^\//],
       }),
     ],
     // Set tracesSampleRate to 1.0 to capture 100%

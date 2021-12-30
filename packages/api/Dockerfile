@@ -17,6 +17,7 @@ FROM scratch
 LABEL org.opencontainers.image.source=https://github.com/marmorag/supateam
 
 COPY --from=builder /app/packages/api/supateam /supateam
+COPY --from=builder /app/packages/api/data.yaml.enc /data.yaml.enc
 
 ENTRYPOINT ["/supateam"]
 CMD ["serve"]

@@ -20,6 +20,8 @@ RUN cd /thttpd \
 RUN adduser -D static-user
 
 FROM scratch as application
+LABEL org.opencontainers.image.source=https://github.com/marmorag/supateam
+
 COPY --from=thttpd-builder /etc/passwd /etc/passwd
 COPY --from=thttpd-builder /thttpd/thttpd /bin/thttpd
 

@@ -61,3 +61,15 @@ jobs:
             ghcr.io/marmorag/supateam-${{ matrix.service.name }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  rollout:
+    runs-on: ubuntu-latest
+    needs: [ release, build ]
+    steps:
+      - name: rollout new version
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.GHCR_TOKEN }}
+          repository: marmorag/System
+          event-type: rollout
+          client-payload: '{"application": "supateam", "service": "*", "environment": "prod", "tag": "${{ needs.release.outputs.tag }}"}'

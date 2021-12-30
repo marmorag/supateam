@@ -19,9 +19,10 @@ type Configuration struct {
 	CorsAllowHeaders string
 	CorsAllowMethods string
 	// App configuration
-	ApplicationSecret  string
-	ApplicationPrefork bool
-	ApplicationName    string
+	ApplicationSecret        string
+	ApplicationPrefork       bool
+	ApplicationName          string
+	ApplicationAESPassphrase string
 }
 
 var config Configuration
@@ -40,17 +41,18 @@ func InitConfig() {
 	dbPort, _ := strconv.Atoi(getEnv("DB_PORT", "27017"))
 
 	config = Configuration{
-		DbHost:             getEnv("DB_HOST", "localhost"),
-		DbPort:             dbPort,
-		DbName:             getEnv("DB_NAME", "supateam"),
-		DbUser:             getEnv("DB_USER", "supateam"),
-		DbPass:             getEnv("DB_PASS", "supateam"),
-		CorsAllowOrigins:   getEnv("CORS_ALLOW_ORIGINS", "*"),
-		CorsAllowHeaders:   getEnv("CORS_ALLOW_HEADERS", ""),
-		CorsAllowMethods:   getEnv("CORS_ALLOW_METHODS", "GET,POST,HEAD,PUT,DELETE,OPTIONS"),
-		ApplicationSecret:  getEnv("APP_SECRET", ""),
-		ApplicationPrefork: getEnvBool("APP_PREFORK", false),
-		ApplicationName:    getEnv("APP_NAME", "SupaTeam"),
+		DbHost:                   getEnv("DB_HOST", "localhost"),
+		DbPort:                   dbPort,
+		DbName:                   getEnv("DB_NAME", "supateam"),
+		DbUser:                   getEnv("DB_USER", "supateam"),
+		DbPass:                   getEnv("DB_PASS", "supateam"),
+		CorsAllowOrigins:         getEnv("CORS_ALLOW_ORIGINS", "*"),
+		CorsAllowHeaders:         getEnv("CORS_ALLOW_HEADERS", ""),
+		CorsAllowMethods:         getEnv("CORS_ALLOW_METHODS", "GET,POST,HEAD,PUT,DELETE,OPTIONS"),
+		ApplicationSecret:        getEnv("APP_SECRET", ""),
+		ApplicationPrefork:       getEnvBool("APP_PREFORK", false),
+		ApplicationName:          getEnv("APP_NAME", "SupaTeam"),
+		ApplicationAESPassphrase: getEnv("APP_AES_PASSPHRASE", ""),
 	}
 }
 

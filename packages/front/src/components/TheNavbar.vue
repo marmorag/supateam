@@ -31,7 +31,9 @@
 import { computed } from "vue";
 import { useStore } from "vuex";
 import useAuthorization from "../services/authorization";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const store = useStore();
 const { authorize, USERS_API_GROUP, EVENTS_API_GROUP, WRITE_API_ACTION, ALL_API_ACTION } = useAuthorization(store);
 
@@ -57,5 +59,6 @@ const isAdmin = computed(() => authorize({ api: USERS_API_GROUP, action: ALL_API
 const handleDisconnect = async () => {
   await store.dispatch("auth/disconnect");
   await store.dispatch("service/clearAuthenticationToken");
+  await router.push({ name: "login" })
 };
 </script>

@@ -14,6 +14,7 @@ RUN cd packages/api && \
     TARGETOS=${TARGETOS} TARGETARCH=${TARGETARCH} CGO_ENABLED=0 make build
 
 FROM scratch
+LABEL org.opencontainers.image.source=https://github.com/marmorag/supateam
 
 COPY --from=builder /app/packages/api/supateam /supateam
 

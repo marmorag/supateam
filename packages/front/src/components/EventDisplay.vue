@@ -2,10 +2,10 @@
   <v-row>
     <v-col cols="12">
       <v-row class="d-flex justify-space-between">
-        <v-col cols="6">
+        <v-col md="6" sm="8">
           <h3>Nom de l'évènement : {{ event.title }}</h3>
         </v-col>
-        <v-col cols="2" align-self="end">
+        <v-col md="2" sm="6" align-self="end">
           <v-chip :color="kindColorMapping[event.kind]" text-color="white" >{{ event.kind }}</v-chip>
         </v-col>
       </v-row>

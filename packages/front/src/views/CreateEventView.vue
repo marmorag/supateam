@@ -1,9 +1,9 @@
 <template class="create-event-view">
   <ThePageTitle offset="2" />
   <v-row>
-    <v-col cols="8" offset="2" class="pa-5">
-      <v-row>
-        <v-col cols="4" class="pa-0">
+    <v-col md="8" offset-md="2" sm="10" offset-sm="1" class="pa-5">
+      <v-row :class="{'d-flex': isMobile, 'flex-column': isMobile }">
+        <v-col md="4" sm="10" class="pa-0">
           <v-text-field
             v-model="event.Title"
             label="Nom de l'évènement"
@@ -12,7 +12,7 @@
             @input="v$.Title.$touch()"
           />
         </v-col>
-        <v-col cols="8" class="pa-0">
+        <v-col md="8" sm="10" class="pa-0">
           <v-radio-group
             v-model="event.Kind"
             label="Type d'évènement"
@@ -24,7 +24,7 @@
             <v-radio  v-for="(kind, index) in eventKindList" :key="`kind-${index}`" :label="kind" :value="kind" />
           </v-radio-group>
         </v-col>
-        <v-col cols="8" class="py-0 pl-0">
+        <v-col md="8" sm="10" :class="{'py-0': true, 'pl-0': !isMobile }">
           <DatePicker v-model="event.Date" mode="date" >
             <template #default="{ inputValue, inputEvents }">
               <v-text-field
@@ -38,7 +38,7 @@
             </template>
           </DatePicker>
         </v-col>
-        <v-col cols="4" class="py-0 pr-0">
+        <v-col md="4" sm="10" :class="{'py-0': true, 'pr-0': !isMobile }">
           <v-text-field
             v-model="event.Duration"
             label="Durée (jours)"
@@ -48,7 +48,7 @@
             @input="v$.Duration.$touch()"
           />
         </v-col>
-        <v-col cols="12" class="pa-0">
+        <v-col md="12" sm="12" class="pa-0">
           <v-textarea
             v-model="event.Description"
             label="Notes pour l'évènement"
@@ -57,10 +57,10 @@
             @input="v$.Description.$touch()"
           />
         </v-col>
-        <v-col cols="6" class="py-0 pl-0">
+        <v-col md="6" sm="12" :class="{'py-0': true, 'pl-0': !isMobile }">
           <ChipSelection v-model="event.Players" selector-key="name" label="Participants" :selectable="users" />
         </v-col>
-        <v-col cols="6" class="py-0 pr-0">
+        <v-col md="6" sm="12" :class="{'py-0': true, 'pr-0': !isMobile }">
           <ChipSelection v-model="event.Teams" selector-key="name" label="Équipes" :selectable="teams" />
         </v-col>
       </v-row>
@@ -79,7 +79,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { DatePicker } from "v-calendar";
@@ -90,7 +90,9 @@ import ChipSelection from "../components/ChipSelection.vue";
 import useEvents from "../services/events";
 import useUsers from "../services/users";
 import useTeams from "../services/teams";
+import { useDisplay } from "vuetify";
 
+const display = useDisplay();
 const router = useRouter();
 const store = useStore();
 const { eventKindList, createEvent } = useEvents(store, false);
@@ -108,6 +110,8 @@ const event = ref({
   Players: [],
   Teams: [],
 });
+
+const isMobile = computed(() => display.mobile.value)
 
 const rules = {
   Title: { required },

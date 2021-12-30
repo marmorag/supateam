@@ -2,7 +2,7 @@
   <v-app-bar app>
     <v-app-bar-title>Team Superflu</v-app-bar-title>
     <v-spacer />
-    <template v-if="isAuthenticated">
+    <template v-if="isAuthenticated && !isMobile">
       <v-btn v-if="isAdmin" prepend-icon="mdi-chess-king">
         Administration
         <v-menu activator="parent" anchor="bottom end">
@@ -21,21 +21,51 @@
       <v-divider inset vertical></v-divider>
       <v-btn class="mx-5" prepend-icon="mdi-logout" @click="handleDisconnect">Déconnexion</v-btn>
     </template>
+    <template v-else-if="isAuthenticated && isMobile">
+      <v-btn icon="mdi-menu" @click="toggleDrawer"></v-btn>
+    </template>
     <template v-else>
       <v-btn class="mx-5" prepend-icon="mdi-login" :to="{ name: 'login' }">Connexion</v-btn>
     </template>
   </v-app-bar>
+
+  <v-navigation-drawer v-model="drawer" absolute :temporary="true">
+    <v-list :nav="true" density="compact">
+        <v-list-item v-if="canCreateEvent" :to="{ name: 'create-event' }" @click="toggleDrawer">
+          <v-list-item-avatar>
+            <v-icon>mdi-calendar-plus</v-icon>
+          </v-list-item-avatar>
+          <v-list-item-title>Évènements</v-list-item-title>
+        </v-list-item>
+
+        <v-list-item :to="{ name: 'calendar' }" @click="toggleDrawer">
+          <v-list-item-avatar>
+            <v-icon>mdi-calendar</v-icon>
+          </v-list-item-avatar>
+          <v-list-item-title>Calendrier</v-list-item-title>
+        </v-list-item>
+
+        <v-list-item  @click="handleDisconnect">
+          <v-list-item-avatar>
+            <v-icon>mdi-logout</v-icon>
+          </v-list-item-avatar>
+          <v-list-item-title>Déconnexion</v-list-item-title>
+        </v-list-item>
+    </v-list>
+  </v-navigation-drawer>
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { useStore } from "vuex";
+import { useDisplay } from "vuetify";
 import useAuthorization from "../services/authorization";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
 const store = useStore();
 const { authorize, USERS_API_GROUP, EVENTS_API_GROUP, WRITE_API_ACTION, ALL_API_ACTION } = useAuthorization(store);
+const display = useDisplay();
 
 const adminLink = [
   {
@@ -49,16 +79,24 @@ const adminLink = [
   // },
 ];
 
+const drawer = ref(false);
+
 const isAuthenticated = computed(() => {
   return store.getters["auth/isAuthenticated"];
 })
 
 const canCreateEvent = computed(() => authorize({ api: EVENTS_API_GROUP, action: WRITE_API_ACTION }) || false);
 const isAdmin = computed(() => authorize({ api: USERS_API_GROUP, action: ALL_API_ACTION }) || false);
+const isMobile = computed(() => display.mobile.value)
+
+const toggleDrawer = () => {
+  drawer.value = !drawer.value
+}
 
 const handleDisconnect = async () => {
   await store.dispatch("auth/disconnect");
   await store.dispatch("service/clearAuthenticationToken");
   await router.push({ name: "login" })
+  toggleDrawer()
 };
 </script>

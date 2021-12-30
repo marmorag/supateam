@@ -1,7 +1,7 @@
 <template>
   <ThePageTitle offset="2" />
   <v-row>
-    <v-col cols="8" offset="2">
+    <v-col md="8" offset-md="2" sm="10" offset-sm="1">
       <EventDisplay v-if="loaded" :event="event" :participations="participations"/>
     </v-col>
   </v-row>

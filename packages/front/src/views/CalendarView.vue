@@ -1,7 +1,7 @@
 <template>
   <ThePageTitle />
   <v-row>
-    <v-col cols="6" offset="1">
+    <v-col md="6" offset-md="1" sm="8" offset-sm="2">
       <v-row>
         <v-col cols="12">
           <Calendar ref="calendar" :attributes="calendarAttributes" locale="fr" is-expanded @update:to-page="handleToPage">
@@ -21,7 +21,7 @@
         </v-col>
       </v-row>
     </v-col>
-    <v-col cols="3">
+    <v-col md="3" sm="8" offset-sm="2">
       <EventList :events="events" :participations="participations" :month="currentMonth" :year="currentYear" @participation:refresh="syncParticipation" />
     </v-col>
   </v-row>

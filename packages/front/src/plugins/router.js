@@ -26,6 +26,12 @@ const router = createRouter({
       },
     },
     {
+      path: "/",
+      redirect: {
+        name: "calendar",
+      },
+    },
+    {
       name: "calendar",
       path: "/calendar",
       component: CalendarView,

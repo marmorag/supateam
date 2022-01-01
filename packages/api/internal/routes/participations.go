@@ -2,6 +2,7 @@ package routes
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/marmorag/supateam/internal"
 	"github.com/marmorag/supateam/internal/middleware/auth"
 	"github.com/marmorag/supateam/internal/models"
 	"github.com/marmorag/supateam/internal/repository"
@@ -13,8 +14,8 @@ type ParticipationRouteHandler struct{}
 func (ParticipationRouteHandler) Register(app fiber.Router) {
 	participationsApi := app.Group("/participations")
 
-	participationsApi.Get("/", getParticipations)
-	participationsApi.Get("/:id", getParticipation)
+	participationsApi.Get("/", auth.Authenticated(), getParticipations)
+	participationsApi.Get("/:id", auth.Authenticated(), getParticipation)
 	participationsApi.Post("", auth.Authenticated(), createParticipation)
 	participationsApi.Put("/:id", auth.Authenticated(), updateParticipation)
 	participationsApi.Delete("/:id", auth.Authenticated(), deleteParticipation)
@@ -31,7 +32,7 @@ func (ParticipationRouteHandler) Register(app fiber.Router) {
 // @Success 200 array []models.Participation
 // @Router /participations [get]
 func getParticipations(c *fiber.Ctx) error {
-	pr := repository.NewParticipationRepository()
+	pr := repository.NewParticipationRepository(c.Locals(internal.GetConfig().RequestIDKey).(string))
 	participations, err := pr.FindAll()
 	if err != nil {
 		return jsonError(c, fiber.StatusInternalServerError, err.Error())
@@ -53,7 +54,7 @@ func getParticipations(c *fiber.Ctx) error {
 // @Success 200 {object} models.Participation
 // @Router /participations/{id} [get]
 func getParticipation(c *fiber.Ctx) error {
-	pr := repository.NewParticipationRepository()
+	pr := repository.NewParticipationRepository(c.Locals(internal.GetConfig().RequestIDKey).(string))
 
 	participation, err := pr.FindOneById(c.Params("id"))
 	if err != nil {
@@ -72,7 +73,7 @@ func getParticipation(c *fiber.Ctx) error {
 // @Success 200 {object} models.Participation
 // @Router /participations [post]
 func createParticipation(c *fiber.Ctx) error {
-	pr := repository.NewParticipationRepository()
+	pr := repository.NewParticipationRepository(c.Locals(internal.GetConfig().RequestIDKey).(string))
 
 	createParticipationRequest := new(models.CreateParticipationRequest)
 	if err := c.BodyParser(createParticipationRequest); err != nil {
@@ -109,7 +110,7 @@ func createParticipation(c *fiber.Ctx) error {
 // @Param id path string true "Participation ID"
 // @Router /participations/{id} [put]
 func updateParticipation(c *fiber.Ctx) error {
-	pr := repository.NewParticipationRepository()
+	pr := repository.NewParticipationRepository(c.Locals(internal.GetConfig().RequestIDKey).(string))
 
 	updateParticipationRequest := new(models.UpdateParticipationRequest)
 	if err := c.BodyParser(updateParticipationRequest); err != nil {
@@ -139,7 +140,7 @@ func updateParticipation(c *fiber.Ctx) error {
 // @Param id path string true "Participation ID"
 // @Router /participations/{id} [delete]
 func deleteParticipation(c *fiber.Ctx) error {
-	pr := repository.NewParticipationRepository()
+	pr := repository.NewParticipationRepository(c.Locals(internal.GetConfig().RequestIDKey).(string))
 
 	err := pr.Delete(c.Params("id"))
 	if err != nil {

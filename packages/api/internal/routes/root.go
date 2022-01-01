@@ -4,6 +4,7 @@ import (
 	"github.com/go-playground/validator"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/marmorag/supateam/internal"
 	"github.com/marmorag/supateam/internal/models"
 	"github.com/marmorag/supateam/internal/repository"
 )
@@ -38,7 +39,7 @@ func GetUserFromContext(c *fiber.Ctx) (*models.User, error) {
 	token := c.Locals("user").(*jwt.Token)
 
 	userId := models.GetUserIdFromToken(token)
-	ur := repository.NewUserRepository()
+	ur := repository.NewUserRepository(c.Locals(internal.GetConfig().RequestIDKey).(string))
 
 	return ur.FindOneById(userId)
 }

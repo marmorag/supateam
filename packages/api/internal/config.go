@@ -24,6 +24,9 @@ type Configuration struct {
 	ApplicationPrefork       bool
 	ApplicationName          string
 	ApplicationAESPassphrase string
+	RequestIDKey             string
+	// Tracing config
+	TracingEnabled bool
 }
 
 var config Configuration
@@ -55,7 +58,17 @@ func InitConfig() {
 		ApplicationPrefork:       getEnvBool("APP_PREFORK", false),
 		ApplicationName:          getEnv("APP_NAME", "SupaTeam"),
 		ApplicationAESPassphrase: getEnv("APP_AES_PASSPHRASE", ""),
+		RequestIDKey:             "requestid",
+		TracingEnabled:           getEnvBool("TRACING_ENABLED", false),
 	}
+}
+
+func Set(newCfg Configuration) {
+	config = newCfg
+}
+
+func Clear() {
+	config = Configuration{}
 }
 
 func getEnvExtension() string {

@@ -2,6 +2,8 @@ package seeder
 
 import (
 	"context"
+	"github.com/marmorag/supateam/internal"
+	"github.com/marmorag/supateam/internal/middleware/auth"
 	"github.com/marmorag/supateam/internal/models"
 	"github.com/marmorag/supateam/internal/repository"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -11,11 +13,15 @@ import (
 type Seeder struct{}
 
 func (s Seeder) Seed() error {
+	config := internal.GetConfig()
+	config.TracingEnabled = false
+	internal.Set(config)
+
 	// empty collection
-	_ = repository.NewEventRepository().Collection.Drop(context.Background())
-	_ = repository.NewUserRepository().Collection.Drop(context.Background())
-	_ = repository.NewTeamRepository().Collection.Drop(context.Background())
-	_ = repository.NewParticipationRepository().Collection.Drop(context.Background())
+	_ = repository.NewEventRepository("").Collection.Drop(context.Background())
+	_ = repository.NewUserRepository("").Collection.Drop(context.Background())
+	_ = repository.NewTeamRepository("").Collection.Drop(context.Background())
+	_ = repository.NewParticipationRepository("").Collection.Drop(context.Background())
 
 	// seed all entities
 	err := seedUsers()
@@ -54,66 +60,98 @@ func seedUsers() error {
 	}
 
 	users = append(users, models.User{
-		Identity:      parsed.Phones["Guillaume"],
-		Name:          "Guillaume",
-		Authorization: map[string][]string{"events": {"*"}, "users": {"*"}},
+		Identity: parsed.Phones["Guillaume"],
+		Name:     "Guillaume",
+		Authorization: map[auth.ApiGroups][]auth.ApiAction{
+			auth.EventsApiGroup:         {auth.AllAction},
+			auth.UsersApiGroup:          {auth.AllAction},
+			auth.ParticipationsApiGroup: {auth.AllAction},
+			auth.TeamsApiGroup:          {auth.AllAction},
+		},
 	})
 
 	users = append(users, models.User{
-		Identity:      parsed.Phones["Alex"],
-		Name:          "Alex",
-		Authorization: map[string][]string{"events": {"read", "write"}, "users": {"read"}},
+		Identity: parsed.Phones["Alex"],
+		Name:     "Alex",
+		Authorization: map[auth.ApiGroups][]auth.ApiAction{
+			"events": {"read", "write"},
+			"users":  {"read"},
+		},
 	})
 
 	users = append(users, models.User{
-		Identity:      parsed.Phones["Baptiste"],
-		Name:          "Baptiste",
-		Authorization: map[string][]string{"events": {"read", "write"}, "users": {"read"}},
+		Identity: parsed.Phones["Baptiste"],
+		Name:     "Baptiste",
+		Authorization: map[auth.ApiGroups][]auth.ApiAction{
+			"events": {"read", "write"},
+			"users":  {"read"},
+		},
 	})
 
 	users = append(users, models.User{
-		Identity:      parsed.Phones["Vincent"],
-		Name:          "Vincent",
-		Authorization: map[string][]string{"events": {"read", "write"}, "users": {"read"}},
+		Identity: parsed.Phones["Vincent"],
+		Name:     "Vincent",
+		Authorization: map[auth.ApiGroups][]auth.ApiAction{
+			"events": {"read", "write"},
+			"users":  {"read"},
+		},
 	})
 
 	users = append(users, models.User{
-		Identity:      parsed.Phones["Adrien"],
-		Name:          "Adrien",
-		Authorization: map[string][]string{"events": {"read", "write"}, "users": {"read"}},
+		Identity: parsed.Phones["Adrien"],
+		Name:     "Adrien",
+		Authorization: map[auth.ApiGroups][]auth.ApiAction{
+			"events": {"read", "write"},
+			"users":  {"read"},
+		},
 	})
 
 	users = append(users, models.User{
-		Identity:      parsed.Phones["Jérémy"],
-		Name:          "Jérémy",
-		Authorization: map[string][]string{"events": {"read", "write"}, "users": {"read"}},
+		Identity: parsed.Phones["Jérémy"],
+		Name:     "Jérémy",
+		Authorization: map[auth.ApiGroups][]auth.ApiAction{
+			"events": {"read", "write"},
+			"users":  {"read"},
+		},
 	})
 
 	users = append(users, models.User{
-		Identity:      parsed.Phones["Clément"],
-		Name:          "Clément",
-		Authorization: map[string][]string{"events": {"read", "write"}, "users": {"read"}},
+		Identity: parsed.Phones["Clément"],
+		Name:     "Clément",
+		Authorization: map[auth.ApiGroups][]auth.ApiAction{
+			"events": {"read", "write"},
+			"users":  {"read"},
+		},
 	})
 
 	users = append(users, models.User{
-		Identity:      parsed.Phones["Mike"],
-		Name:          "Mike",
-		Authorization: map[string][]string{"events": {"read", "write"}, "users": {"read"}},
+		Identity: parsed.Phones["Mike"],
+		Name:     "Mike",
+		Authorization: map[auth.ApiGroups][]auth.ApiAction{
+			"events": {"read", "write"},
+			"users":  {"read"},
+		},
 	})
 
 	users = append(users, models.User{
-		Identity:      parsed.Phones["Arthur"],
-		Name:          "Arthur",
-		Authorization: map[string][]string{"events": {"read", "write"}, "users": {"read"}},
+		Identity: parsed.Phones["Arthur"],
+		Name:     "Arthur",
+		Authorization: map[auth.ApiGroups][]auth.ApiAction{
+			"events": {"read", "write"},
+			"users":  {"read"},
+		},
 	})
 
 	users = append(users, models.User{
-		Identity:      parsed.Phones["Flo"],
-		Name:          "Flo",
-		Authorization: map[string][]string{"events": {"read", "write"}, "users": {"read"}},
+		Identity: parsed.Phones["Flo"],
+		Name:     "Flo",
+		Authorization: map[auth.ApiGroups][]auth.ApiAction{
+			"events": {"read", "write"},
+			"users":  {"read"},
+		},
 	})
 
-	ur := repository.NewUserRepository()
+	ur := repository.NewUserRepository("")
 	for _, user := range users {
 		_, err := ur.Create(&user)
 		if err != nil {
@@ -125,8 +163,8 @@ func seedUsers() error {
 }
 
 func seedTeams() error {
-	ur := repository.NewUserRepository()
-	tr := repository.NewTeamRepository()
+	ur := repository.NewUserRepository("")
+	tr := repository.NewTeamRepository("")
 
 	users, err := ur.FindAll()
 	members := make([]primitive.ObjectID, 0)
@@ -150,7 +188,7 @@ func seedTeams() error {
 
 func seedEvents() error {
 	events := make([]models.Event, 0)
-	teams, _ := repository.NewTeamRepository().FindAll()
+	teams, _ := repository.NewTeamRepository("").FindAll()
 	teamId := teams[0].Id
 
 	events = append(events, models.Event{
@@ -298,8 +336,8 @@ func seedEvents() error {
 		Teams:       []primitive.ObjectID{teamId},
 	})
 
-	er := repository.NewEventRepository()
-	pr := repository.NewParticipationRepository()
+	er := repository.NewEventRepository("")
+	pr := repository.NewParticipationRepository("")
 	for _, event := range events {
 		created, err := er.Create(&event)
 		if err != nil {
@@ -328,18 +366,24 @@ func seedAdmins() error {
 	}
 
 	users = append(users, models.User{
-		Identity:      parsed.Phones["Cyril"],
-		Name:          "Cyril",
-		Authorization: map[string][]string{"events": {"*"}, "users": {"*"}},
+		Identity: parsed.Phones["Cyril"],
+		Name:     "Cyril",
+		Authorization: map[auth.ApiGroups][]auth.ApiAction{
+			"events": {"*"},
+			"users":  {"*"},
+		},
 	})
 
 	users = append(users, models.User{
-		Identity:      parsed.Phones["Benoit"],
-		Name:          "Benoit",
-		Authorization: map[string][]string{"events": {"*"}, "users": {"*"}},
+		Identity: parsed.Phones["Benoit"],
+		Name:     "Benoit",
+		Authorization: map[auth.ApiGroups][]auth.ApiAction{
+			"events": {"*"},
+			"users":  {"*"},
+		},
 	})
 
-	ur := repository.NewUserRepository()
+	ur := repository.NewUserRepository("")
 	for _, user := range users {
 		_, err := ur.Create(&user)
 		if err != nil {

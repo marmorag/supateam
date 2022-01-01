@@ -13,5 +13,12 @@ services:
     volumes:
       - supateam-mongo-data:/data/db
 
+  supateam-jaeger:
+    container_name: supateam-jaeger
+    image: jaegertracing/all-in-one:1.29
+    ports:
+      - "6831:6831/udp"
+      - "16686:16686"
+
 volumes:
   supateam-mongo-data:

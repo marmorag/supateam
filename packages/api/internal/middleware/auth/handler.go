@@ -3,6 +3,8 @@ package auth
 import (
 	"errors"
 	"fmt"
+	"github.com/marmorag/supateam/internal"
+	"github.com/marmorag/supateam/internal/tracing"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -135,8 +137,12 @@ func New(config ...Config) fiber.Handler {
 	}
 	// Return middleware handler
 	return func(c *fiber.Ctx) error {
+		requestId := c.Locals(internal.GetConfig().RequestIDKey).(string)
+		span, _ := tracing.Start(requestId, "auth:authenticated")
+
 		// Filter request to skip middleware
 		if cfg.Filter != nil && cfg.Filter(c) {
+			tracing.End(span)
 			return c.Next()
 		}
 		var auth string
@@ -150,11 +156,13 @@ func New(config ...Config) fiber.Handler {
 		}
 
 		if err != nil {
+			tracing.End(span)
 			return cfg.ErrorHandler(c, err)
 		}
 		token := new(jwt.Token)
 		token, err = jwt.ParseWithClaims(auth, cfg.Claims.(*ApplicationClaim), cfg.keyFunc)
 
+		tracing.End(span)
 		if err == nil && token.Valid {
 			// Store user information from token into context.
 			c.Locals(cfg.ContextKey, token)
@@ -208,4 +216,3 @@ func jwtFromCookie(name string) func(c *fiber.Ctx) (string, error) {
 		return token, nil
 	}
 }
-

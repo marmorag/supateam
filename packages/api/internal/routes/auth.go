@@ -41,7 +41,7 @@ func authUser(c *fiber.Ctx) error {
 		return jsonError(c, fiber.StatusBadRequest, validationErrors)
 	}
 
-	userRepository := repository.NewUserRepository()
+	userRepository := repository.NewUserRepository(c.Locals(internal.GetConfig().RequestIDKey).(string))
 	user, err := userRepository.FindOneByIdentity(authRequest.Identity)
 	if err != nil {
 		return jsonError(c, fiber.StatusNotFound, err)

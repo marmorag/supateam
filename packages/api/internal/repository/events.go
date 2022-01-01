@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"github.com/marmorag/supateam/internal/models"
+	"github.com/marmorag/supateam/internal/tracing"
+	"github.com/opentracing/opentracing-go"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -14,9 +16,10 @@ type EventRepository struct {
 	CollectionName string
 	Collection     *mongo.Collection
 	Context        context.Context
+	RequestID      string
 }
 
-func NewEventRepository() EventRepository {
+func NewEventRepository(requestid string) EventRepository {
 	collectionName := "Events"
 	c, err := GetMongoDbCollection(collectionName)
 
@@ -28,6 +31,7 @@ func NewEventRepository() EventRepository {
 		CollectionName: collectionName,
 		Collection:     c,
 		Context:        context.Background(),
+		RequestID:      requestid,
 	}
 }
 
@@ -35,6 +39,8 @@ func (er EventRepository) FindAll() ([]models.Event, error) {
 	if er.Collection == nil {
 		return nil, errors.New("missing connection")
 	}
+	span, _ := tracing.Start(er.RequestID, "db:events:find-all")
+	defer tracing.End(span)
 
 	results := make([]models.Event, 0)
 	cur, err := er.Collection.Find(er.Context, bson.M{})
@@ -48,6 +54,9 @@ func (er EventRepository) FindAll() ([]models.Event, error) {
 }
 
 func (er EventRepository) FindAllBy(filter bson.M) ([]models.Event, error) {
+	span, _ := tracing.Start(er.RequestID, "db:events:find-all-by", opentracing.Tag{Key: "filter", Value: filter})
+	defer tracing.End(span)
+
 	var fetchedEvent []models.Event
 
 	cur, err := er.Collection.Find(er.Context, filter)
@@ -64,6 +73,9 @@ func (er EventRepository) FindOneById(id string) (*models.Event, error) {
 	if er.Collection == nil {
 		return nil, errors.New("missing connection")
 	}
+
+	span, _ := tracing.Start(er.RequestID, "db:events:find-one-by-id", opentracing.Tag{Key: "id", Value: id})
+	defer tracing.End(span)
 
 	objID, _ := primitive.ObjectIDFromHex(id)
 	filter := bson.M{"_id": objID}
@@ -82,6 +94,9 @@ func (er EventRepository) Create(e *models.Event) (*models.Event, error) {
 		return nil, errors.New("missing connection")
 	}
 
+	span, _ := tracing.Start(er.RequestID, "db:events:create", opentracing.Tag{Key: "event", Value: *e})
+	defer tracing.End(span)
+
 	e.Id = primitive.NewObjectID()
 
 	_, err := er.Collection.InsertOne(er.Context, e)
@@ -93,6 +108,12 @@ func (er EventRepository) Update(id string, e models.UpdateEventRequest) (*model
 	if er.Collection == nil {
 		return nil, errors.New("missing connection")
 	}
+
+	span, _ := tracing.Start(er.RequestID, "db:events:update",
+		opentracing.Tag{Key: "event", Value: id},
+		opentracing.Tag{Key: "updated", Value: e},
+	)
+	defer tracing.End(span)
 
 	event, err := er.FindOneById(id)
 	if err != nil {
@@ -121,6 +142,9 @@ func (er EventRepository) Delete(id string) error {
 	if er.Collection == nil {
 		return errors.New("missing connection")
 	}
+
+	span, _ := tracing.Start(er.RequestID, "db:events:delete", opentracing.Tag{Key: "id", Value: id})
+	defer tracing.End(span)
 
 	objID, _ := primitive.ObjectIDFromHex(id)
 	_, err := er.Collection.DeleteOne(er.Context, bson.M{"_id": objID})

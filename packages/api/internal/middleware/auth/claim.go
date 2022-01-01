@@ -7,10 +7,10 @@ import (
 )
 
 type ApplicationClaim struct {
-	ExpiresAt int64 `json:"exp"`
-	UserName string `json:"userName"`
-	UserId string `json:"userId"`
-	UserAuthorization map[string][]string `json:"userAuthorization"`
+	ExpiresAt         int64                     `json:"exp"`
+	UserName          string                    `json:"userName"`
+	UserId            string                    `json:"userId"`
+	UserAuthorization map[ApiGroups][]ApiAction `json:"userAuthorization"`
 }
 
 func (a ApplicationClaim) Valid() error {
@@ -26,6 +26,6 @@ func (a ApplicationClaim) Valid() error {
 	return validationErr
 }
 
-func ParseToken()  {
+func ParseToken() {
 
 }

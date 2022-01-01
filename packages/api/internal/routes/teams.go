@@ -2,6 +2,7 @@ package routes
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/marmorag/supateam/internal"
 	"github.com/marmorag/supateam/internal/middleware/auth"
 	"github.com/marmorag/supateam/internal/models"
 	"github.com/marmorag/supateam/internal/repository"
@@ -13,9 +14,9 @@ type TeamRouteHandler struct{}
 func (TeamRouteHandler) Register(app fiber.Router) {
 	teamsApi := app.Group("/teams")
 
-	teamsApi.Get("/", getTeams)
-	teamsApi.Get("/:id", getTeam)
-	teamsApi.Post("", createTeam)
+	teamsApi.Get("/", auth.Authenticated(), getTeams)
+	teamsApi.Get("/:id", auth.Authenticated(), getTeam)
+	teamsApi.Post("", auth.Authenticated(), createTeam)
 	teamsApi.Put("/:id", auth.Authenticated(), updateTeam)
 	teamsApi.Delete("/:id", auth.Authenticated(), deleteTeam)
 
@@ -31,7 +32,7 @@ func (TeamRouteHandler) Register(app fiber.Router) {
 // @Success 200 array []models.Team
 // @Router /teams [get]
 func getTeams(c *fiber.Ctx) error {
-	tr := repository.NewTeamRepository()
+	tr := repository.NewTeamRepository(c.Locals(internal.GetConfig().RequestIDKey).(string))
 	teams, err := tr.FindAll()
 	if err != nil {
 		return jsonError(c, fiber.StatusInternalServerError, err.Error())
@@ -53,7 +54,7 @@ func getTeams(c *fiber.Ctx) error {
 // @Success 200 {object} models.Team
 // @Router /teams/{id} [get]
 func getTeam(c *fiber.Ctx) error {
-	tr := repository.NewTeamRepository()
+	tr := repository.NewTeamRepository(c.Locals(internal.GetConfig().RequestIDKey).(string))
 
 	team, err := tr.FindOneById(c.Params("id"))
 	if err != nil {
@@ -72,7 +73,7 @@ func getTeam(c *fiber.Ctx) error {
 // @Success 200 {object} models.Team
 // @Router /teams [post]
 func createTeam(c *fiber.Ctx) error {
-	tr := repository.NewTeamRepository()
+	tr := repository.NewTeamRepository(c.Locals(internal.GetConfig().RequestIDKey).(string))
 
 	createTeamRequest := new(models.CreateTeamRequest)
 	if err := c.BodyParser(createTeamRequest); err != nil {
@@ -107,7 +108,7 @@ func createTeam(c *fiber.Ctx) error {
 // @Param id path string true "Team ID"
 // @Router /teams/{id} [put]
 func updateTeam(c *fiber.Ctx) error {
-	tr := repository.NewTeamRepository()
+	tr := repository.NewTeamRepository(c.Locals(internal.GetConfig().RequestIDKey).(string))
 
 	updateTeamRequest := new(models.UpdateTeamRequest)
 	if err := c.BodyParser(updateTeamRequest); err != nil {
@@ -137,7 +138,7 @@ func updateTeam(c *fiber.Ctx) error {
 // @Param id path string true "Team ID"
 // @Router /teams/{id} [delete]
 func deleteTeam(c *fiber.Ctx) error {
-	tr := repository.NewTeamRepository()
+	tr := repository.NewTeamRepository(c.Locals(internal.GetConfig().RequestIDKey).(string))
 
 	err := tr.Delete(c.Params("id"))
 	if err != nil {

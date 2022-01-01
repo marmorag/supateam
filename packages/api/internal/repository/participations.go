@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/marmorag/supateam/internal/models"
+	"github.com/marmorag/supateam/internal/tracing"
+	"github.com/opentracing/opentracing-go"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -15,6 +17,7 @@ type ParticipationRepository struct {
 	CollectionName string
 	Collection     *mongo.Collection
 	Context        context.Context
+	RequestID      string
 }
 
 type ResponseFormat string
@@ -24,7 +27,7 @@ const (
 	ParticipationResponseFormatShort = "short"
 )
 
-func NewParticipationRepository() ParticipationRepository {
+func NewParticipationRepository(requestid string) ParticipationRepository {
 	collectionName := "Participations"
 	c, err := GetMongoDbCollection(collectionName)
 
@@ -36,6 +39,7 @@ func NewParticipationRepository() ParticipationRepository {
 		CollectionName: collectionName,
 		Collection:     c,
 		Context:        context.Background(),
+		RequestID:      requestid,
 	}
 }
 
@@ -43,6 +47,9 @@ func (pr ParticipationRepository) FindAll() ([]models.Participation, error) {
 	if pr.Collection == nil {
 		return nil, errors.New("missing connection")
 	}
+
+	span, _ := tracing.Start(pr.RequestID, "db:participations:create")
+	defer tracing.End(span)
 
 	results := make([]models.Participation, 0)
 	cur, err := pr.Collection.Find(pr.Context, bson.M{})
@@ -60,6 +67,12 @@ func (pr ParticipationRepository) FindAllBy(filter bson.M, format ResponseFormat
 	if pr.Collection == nil {
 		return nil, nil, errors.New("missing connection")
 	}
+
+	span, _ := tracing.Start(pr.RequestID, "db:participations:find-all-by",
+		opentracing.Tag{Key: "filter", Value: filter},
+		opentracing.Tag{Key: "format", Value: format},
+	)
+	defer tracing.End(span)
 
 	var fetchedParticipation []models.Participation
 	var fetchedParticipationLong []models.ParticipationLong
@@ -104,6 +117,9 @@ func (pr ParticipationRepository) FindOneById(id string) (*models.Participation,
 		return nil, errors.New("missing connection")
 	}
 
+	span, _ := tracing.Start(pr.RequestID, "db:participations:find-one-by-id", opentracing.Tag{Key: "id", Value: id})
+	defer tracing.End(span)
+
 	objID, _ := primitive.ObjectIDFromHex(id)
 	filter := bson.M{"_id": objID}
 	var fetchedParticipation models.Participation
@@ -116,29 +132,38 @@ func (pr ParticipationRepository) FindOneById(id string) (*models.Participation,
 	return &fetchedParticipation, nil
 }
 
-func (pr ParticipationRepository) Create(e *models.Participation) (*models.Participation, error) {
+func (pr ParticipationRepository) Create(p *models.Participation) (*models.Participation, error) {
 	if pr.Collection == nil {
 		return nil, errors.New("missing connection")
 	}
 
-	e.Id = primitive.NewObjectID()
+	span, _ := tracing.Start(pr.RequestID, "db:participations:create", opentracing.Tag{Key: "participation", Value: *p})
+	defer tracing.End(span)
 
-	_, err := pr.Collection.InsertOne(pr.Context, e)
+	p.Id = primitive.NewObjectID()
 
-	return e, err
+	_, err := pr.Collection.InsertOne(pr.Context, p)
+
+	return p, err
 }
 
-func (pr ParticipationRepository) Update(id string, e models.UpdateParticipationRequest) (*models.Participation, error) {
+func (pr ParticipationRepository) Update(id string, p models.UpdateParticipationRequest) (*models.Participation, error) {
 	if pr.Collection == nil {
 		return nil, errors.New("missing connection")
 	}
+
+	span, _ := tracing.Start(pr.RequestID, "db:participations:update",
+		opentracing.Tag{Key: "id", Value: id},
+		opentracing.Tag{Key: "participation", Value: p},
+	)
+	defer tracing.End(span)
 
 	participation, err := pr.FindOneById(id)
 	if err != nil {
 		return nil, err
 	}
 
-	participation.Status = e.Status
+	participation.Status = p.Status
 
 	update := bson.M{
 		"$set": participation,
@@ -155,6 +180,9 @@ func (pr ParticipationRepository) Delete(id string) error {
 		return errors.New("missing connection")
 	}
 
+	span, _ := tracing.Start(pr.RequestID, "db:participations:delete", opentracing.Tag{Key: "id", Value: id})
+	defer tracing.End(span)
+
 	objID, _ := primitive.ObjectIDFromHex(id)
 	_, err := pr.Collection.DeleteOne(pr.Context, bson.M{"_id": objID})
 
@@ -162,6 +190,9 @@ func (pr ParticipationRepository) Delete(id string) error {
 }
 
 func (pr ParticipationRepository) deleteBatch(ps []models.Participation) error {
+	span, _ := tracing.Start(pr.RequestID, "db:participations:delete-batch", opentracing.Tag{Key: "participations", Value: len(ps)})
+	defer tracing.End(span)
+
 	pIDs := make([]primitive.ObjectID, 0)
 	for _, p := range ps {
 		pIDs = append(pIDs, p.Id)
@@ -177,6 +208,9 @@ func (pr ParticipationRepository) deleteBatch(ps []models.Participation) error {
 }
 
 func (pr ParticipationRepository) createBatch(ps []models.Participation) error {
+	span, _ := tracing.Start(pr.RequestID, "db:participations:create-batch", opentracing.Tag{Key: "participations", Value: len(ps)})
+	defer tracing.End(span)
+
 	iPs := make([]interface{}, 0)
 	for _, p := range ps {
 		p.Id = primitive.NewObjectID()
@@ -192,7 +226,10 @@ func (pr ParticipationRepository) SyncParticipation(event *models.Event) error {
 		return errors.New("missing connection")
 	}
 
-	tr := NewTeamRepository()
+	span, _ := tracing.Start(pr.RequestID, "db:participations:synchronize", opentracing.Tag{Key: "event", Value: *event})
+	defer tracing.End(span)
+
+	tr := NewTeamRepository(pr.RequestID)
 
 	participations, _, err := pr.FindAllBy(bson.M{
 		"event": event.Id,

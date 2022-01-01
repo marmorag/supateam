@@ -10,22 +10,22 @@ import (
 )
 
 type User struct {
-	Id            primitive.ObjectID  `bson:"_id" json:"id,omitempty"`
-	Identity      string              `json:"-"`
-	Name          string              `json:"name,omitempty"`
-	Authorization map[string][]string `json:"authorization"`
+	Id            primitive.ObjectID                  `bson:"_id" json:"id,omitempty"`
+	Identity      string                              `json:"-"`
+	Name          string                              `json:"name,omitempty"`
+	Authorization map[auth.ApiGroups][]auth.ApiAction `json:"authorization"`
 }
 
 type CreateUserRequest struct {
 	Name          string `validate:"required"`
 	Identity      string `validate:"required"`
-	Authorization map[string][]string
+	Authorization map[auth.ApiGroups][]auth.ApiAction
 }
 
 type UpdateUserRequest struct {
-	Name          string              `validate:"required"`
-	Identity      string              `validate:"alphanum"`
-	Authorization map[string][]string `validate:"required"`
+	Name          string                              `validate:"required"`
+	Identity      string                              `validate:"alphanum"`
+	Authorization map[auth.ApiGroups][]auth.ApiAction `validate:"required"`
 }
 
 func HashPassword(password string) (string, error) {

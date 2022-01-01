@@ -2,6 +2,7 @@ package routes
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/marmorag/supateam/internal"
 	"github.com/marmorag/supateam/internal/middleware/auth"
 	"github.com/marmorag/supateam/internal/models"
 	"github.com/marmorag/supateam/internal/repository"
@@ -15,12 +16,12 @@ type EventRouteHandler struct{}
 func (EventRouteHandler) Register(app fiber.Router) {
 	eventsApi := app.Group("/events")
 
-	eventsApi.Get("/", getEvents)
-	eventsApi.Get("/:id", getEvent)
-	eventsApi.Get("/:id/participations", getEventParticipation)
-	eventsApi.Post("", createEvent)
-	eventsApi.Put("/:id", auth.Authenticated(), updateEvent)
-	eventsApi.Delete("/:id", auth.Authenticated(), deleteEvent)
+	eventsApi.Get("/", auth.Authenticated(), getEvents)
+	eventsApi.Get("/:id", auth.Authenticated(), getEvent)
+	eventsApi.Get("/:id/participations", auth.Authenticated(), getEventParticipation)
+	eventsApi.Post("", auth.Authenticated(), auth.Authorized(auth.EventsApiGroup, auth.WriteAction), createEvent)
+	eventsApi.Put("/:id", auth.Authenticated(), auth.Authorized(auth.EventsApiGroup, auth.UpdateAction), updateEvent)
+	eventsApi.Delete("/:id", auth.Authenticated(), auth.Authorized(auth.EventsApiGroup, auth.DeleteAction), deleteEvent)
 
 	log.Println("Registered events api group.")
 }
@@ -34,7 +35,7 @@ func (EventRouteHandler) Register(app fiber.Router) {
 // @Success 200 array []models.Event
 // @Router /events [get]
 func getEvents(c *fiber.Ctx) error {
-	er := repository.NewEventRepository()
+	er := repository.NewEventRepository(c.Locals(internal.GetConfig().RequestIDKey).(string))
 	events, err := er.FindAll()
 	if err != nil {
 		return jsonError(c, fiber.StatusInternalServerError, err.Error())
@@ -56,7 +57,7 @@ func getEvents(c *fiber.Ctx) error {
 // @Success 200 {object} models.Event
 // @Router /events/{id} [get]
 func getEvent(c *fiber.Ctx) error {
-	er := repository.NewEventRepository()
+	er := repository.NewEventRepository(c.Locals(internal.GetConfig().RequestIDKey).(string))
 
 	event, err := er.FindOneById(c.Params("id"))
 	if err != nil {
@@ -76,7 +77,7 @@ func getEvent(c *fiber.Ctx) error {
 // @Success 200 {object} []models.Participation
 // @Router /events/{id}/participations [get]
 func getEventParticipation(c *fiber.Ctx) error {
-	er := repository.NewParticipationRepository()
+	er := repository.NewParticipationRepository(c.Locals(internal.GetConfig().RequestIDKey).(string))
 
 	responseFormat := repository.ResponseFormat(c.Query("format", repository.ParticipationResponseFormatShort))
 
@@ -115,8 +116,8 @@ func getEventParticipation(c *fiber.Ctx) error {
 // @Success 200 {object} models.Event
 // @Router /events [post]
 func createEvent(c *fiber.Ctx) error {
-	er := repository.NewEventRepository()
-	pr := repository.NewParticipationRepository()
+	er := repository.NewEventRepository(c.Locals(internal.GetConfig().RequestIDKey).(string))
+	pr := repository.NewParticipationRepository(c.Locals(internal.GetConfig().RequestIDKey).(string))
 
 	createEventRequest := new(models.CreateEventRequest)
 	if err := c.BodyParser(createEventRequest); err != nil {
@@ -161,8 +162,8 @@ func createEvent(c *fiber.Ctx) error {
 // @Param id path string true "Event ID"
 // @Router /events/{id} [put]
 func updateEvent(c *fiber.Ctx) error {
-	er := repository.NewEventRepository()
-	pr := repository.NewParticipationRepository()
+	er := repository.NewEventRepository(c.Locals(internal.GetConfig().RequestIDKey).(string))
+	pr := repository.NewParticipationRepository(c.Locals(internal.GetConfig().RequestIDKey).(string))
 
 	updateEventRequest := new(models.UpdateEventRequest)
 	if err := c.BodyParser(updateEventRequest); err != nil {
@@ -197,7 +198,7 @@ func updateEvent(c *fiber.Ctx) error {
 // @Param id path string true "Event ID"
 // @Router /events/{id} [delete]
 func deleteEvent(c *fiber.Ctx) error {
-	er := repository.NewEventRepository()
+	er := repository.NewEventRepository(c.Locals(internal.GetConfig().RequestIDKey).(string))
 
 	err := er.Delete(c.Params("id"))
 	if err != nil {

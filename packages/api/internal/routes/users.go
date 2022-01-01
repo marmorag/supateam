@@ -2,6 +2,7 @@ package routes
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/marmorag/supateam/internal"
 	"github.com/marmorag/supateam/internal/middleware/auth"
 	"github.com/marmorag/supateam/internal/models"
 	"github.com/marmorag/supateam/internal/repository"
@@ -15,10 +16,10 @@ type UserRouteHandler struct{}
 func (UserRouteHandler) Register(app fiber.Router) {
 	usersApi := app.Group("/users")
 
-	usersApi.Get("/", getUsers)
-	usersApi.Get("/:id", getUser)
-	usersApi.Get("/:id/participations", getUserParticipation)
-	usersApi.Post("", createUser)
+	usersApi.Get("/", auth.Authenticated(), getUsers)
+	usersApi.Get("/:id", auth.Authenticated(), getUser)
+	usersApi.Get("/:id/participations", auth.Authenticated(), getUserParticipation)
+	usersApi.Post("", auth.Authenticated(), createUser)
 	usersApi.Put("/:id", auth.Authenticated(), updateUser)
 	usersApi.Delete("/:id", auth.Authenticated(), deleteUser)
 
@@ -34,7 +35,7 @@ func (UserRouteHandler) Register(app fiber.Router) {
 // @Success 200 array []models.User
 // @Router /users [get]
 func getUsers(c *fiber.Ctx) error {
-	ur := repository.NewUserRepository()
+	ur := repository.NewUserRepository(c.Locals(internal.GetConfig().RequestIDKey).(string))
 	users, err := ur.FindAll()
 	if err != nil {
 		return jsonError(c, fiber.StatusInternalServerError, err.Error())
@@ -56,7 +57,7 @@ func getUsers(c *fiber.Ctx) error {
 // @Success 200 {object} models.User
 // @Router /users/{id} [get]
 func getUser(c *fiber.Ctx) error {
-	ur := repository.NewUserRepository()
+	ur := repository.NewUserRepository(c.Locals(internal.GetConfig().RequestIDKey).(string))
 
 	user, err := ur.FindOneById(c.Params("id"))
 	if err != nil {
@@ -76,7 +77,7 @@ func getUser(c *fiber.Ctx) error {
 // @Success 200 {object} []models.Participation
 // @Router /users/{id}/participations [get]
 func getUserParticipation(c *fiber.Ctx) error {
-	er := repository.NewParticipationRepository()
+	er := repository.NewParticipationRepository(c.Locals(internal.GetConfig().RequestIDKey).(string))
 
 	responseFormat := repository.ResponseFormat(c.Query("format", repository.ParticipationResponseFormatShort))
 
@@ -115,7 +116,7 @@ func getUserParticipation(c *fiber.Ctx) error {
 // @Success 200 {object} models.User
 // @Router /users [post]
 func createUser(c *fiber.Ctx) error {
-	ur := repository.NewUserRepository()
+	ur := repository.NewUserRepository(c.Locals(internal.GetConfig().RequestIDKey).(string))
 
 	createUserRequest := new(models.CreateUserRequest)
 	if err := c.BodyParser(createUserRequest); err != nil {
@@ -151,7 +152,7 @@ func createUser(c *fiber.Ctx) error {
 // @Param id path string true "User ID"
 // @Router /users/{id} [put]
 func updateUser(c *fiber.Ctx) error {
-	ur := repository.NewUserRepository()
+	ur := repository.NewUserRepository(c.Locals(internal.GetConfig().RequestIDKey).(string))
 
 	updateUserRequest := new(models.UpdateUserRequest)
 	if err := c.BodyParser(updateUserRequest); err != nil {
@@ -181,7 +182,7 @@ func updateUser(c *fiber.Ctx) error {
 // @Param id path string true "User ID"
 // @Router /users/{id} [delete]
 func deleteUser(c *fiber.Ctx) error {
-	ur := repository.NewUserRepository()
+	ur := repository.NewUserRepository(c.Locals(internal.GetConfig().RequestIDKey).(string))
 
 	err := ur.Delete(c.Params("id"))
 	if err != nil {

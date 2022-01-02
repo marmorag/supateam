@@ -5,6 +5,7 @@ import (
 	"github.com/marmorag/supateam/internal"
 	"github.com/marmorag/supateam/internal/models"
 	"github.com/marmorag/supateam/internal/repository"
+	"github.com/marmorag/supateam/internal/tracing"
 	"log"
 )
 
@@ -13,7 +14,10 @@ type AuthRouteHandler struct{}
 func (AuthRouteHandler) Register(app fiber.Router) {
 	authApi := app.Group("/auth")
 
-	authApi.Post("/login", authUser)
+	authApi.Post("/login",
+		authUser,
+		tracing.HandlerTracer("auth-user"),
+	)
 
 	log.Println("Registered auth api group.")
 }

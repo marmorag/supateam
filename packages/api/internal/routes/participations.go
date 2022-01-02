@@ -6,6 +6,7 @@ import (
 	"github.com/marmorag/supateam/internal/middleware/auth"
 	"github.com/marmorag/supateam/internal/models"
 	"github.com/marmorag/supateam/internal/repository"
+	"github.com/marmorag/supateam/internal/tracing"
 	"log"
 )
 
@@ -14,13 +15,40 @@ type ParticipationRouteHandler struct{}
 func (ParticipationRouteHandler) Register(app fiber.Router) {
 	participationsApi := app.Group("/participations")
 
-	participationsApi.Get("/", auth.Authenticated(), getParticipations)
-	participationsApi.Get("/:id", auth.Authenticated(), getParticipation)
-	participationsApi.Post("", auth.Authenticated(), createParticipation)
-	participationsApi.Put("/:id", auth.Authenticated(), updateParticipation)
-	participationsApi.Delete("/:id", auth.Authenticated(), deleteParticipation)
+	participationsApi.Get("/",
+		auth.Authenticated(),
+		tracing.HandlerTracer("get-participations"),
+		getParticipations,
+	)
+	participationsApi.Get("/:id",
+		auth.Authenticated(),
+		tracing.HandlerTracer("get-participation"),
+		getParticipation,
+	)
+	participationsApi.Post("",
+		auth.Authenticated(),
+		auth.Authorized(auth.ParticipationsApiGroup, auth.WriteSelfAction),
+		tracing.HandlerTracer("create-participation"),
+		createParticipation,
+	)
+	participationsApi.Put("/:id",
+		auth.Authenticated(),
+		auth.Authorized(auth.ParticipationsApiGroup, auth.UpdateSelfAction),
+		tracing.HandlerTracer("update-participation"),
+		updateParticipation,
+	)
+	participationsApi.Delete("/:id",
+		auth.Authenticated(),
+		auth.Authorized(auth.ParticipationsApiGroup, auth.DeleteAction),
+		tracing.HandlerTracer("delete-participation"),
+		deleteParticipation,
+	)
 
 	log.Println("Registered participations api group.")
+}
+
+func (h ParticipationRouteHandler) Vote(userId string, entityId string) bool {
+	return true
 }
 
 // getParticipations godoc

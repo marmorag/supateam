@@ -6,6 +6,7 @@ import (
 	"github.com/marmorag/supateam/internal/middleware/auth"
 	"github.com/marmorag/supateam/internal/models"
 	"github.com/marmorag/supateam/internal/repository"
+	"github.com/marmorag/supateam/internal/tracing"
 	"log"
 )
 
@@ -14,11 +15,34 @@ type TeamRouteHandler struct{}
 func (TeamRouteHandler) Register(app fiber.Router) {
 	teamsApi := app.Group("/teams")
 
-	teamsApi.Get("/", auth.Authenticated(), getTeams)
-	teamsApi.Get("/:id", auth.Authenticated(), getTeam)
-	teamsApi.Post("", auth.Authenticated(), createTeam)
-	teamsApi.Put("/:id", auth.Authenticated(), updateTeam)
-	teamsApi.Delete("/:id", auth.Authenticated(), deleteTeam)
+	teamsApi.Get("/",
+		auth.Authenticated(),
+		tracing.HandlerTracer("get-teams"),
+		getTeams,
+	)
+	teamsApi.Get("/:id",
+		auth.Authenticated(),
+		tracing.HandlerTracer("get-team"),
+		getTeam,
+	)
+	teamsApi.Post("",
+		auth.Authenticated(),
+		auth.Authorized(auth.TeamsApiGroup, auth.WriteAction),
+		tracing.HandlerTracer("create-team"),
+		createTeam,
+	)
+	teamsApi.Put("/:id",
+		auth.Authenticated(),
+		auth.Authorized(auth.TeamsApiGroup, auth.UpdateAction),
+		tracing.HandlerTracer("update-team"),
+		updateTeam,
+	)
+	teamsApi.Delete("/:id",
+		auth.Authenticated(),
+		auth.Authorized(auth.TeamsApiGroup, auth.DeleteAction),
+		tracing.HandlerTracer("delete-team"),
+		deleteTeam,
+	)
 
 	log.Println("Registered teams api group.")
 }

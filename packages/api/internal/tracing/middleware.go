@@ -1,6 +1,7 @@
 package tracing
 
 import (
+	"fmt"
 	fibertracing "github.com/aschenmaker/fiber-opentracing"
 	"github.com/aschenmaker/fiber-opentracing/fjaeger"
 	"github.com/gofiber/fiber/v2"
@@ -85,5 +86,14 @@ func newMiddleware(cfg fibertracing.Config) fiber.Handler {
 			provider.UnregisterSpan(identifier)
 		}()
 		return c.Next()
+	}
+}
+
+func HandlerTracer(handlerName string) fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		span, _ := Start(ctx.Locals(internal.GetConfig().RequestIDKey).(string), fmt.Sprintf("handler:%s", handlerName))
+		defer End(span)
+
+		return ctx.Next()
 	}
 }

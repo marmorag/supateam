@@ -6,6 +6,7 @@ import (
 	"github.com/marmorag/supateam/internal/middleware/auth"
 	"github.com/marmorag/supateam/internal/models"
 	"github.com/marmorag/supateam/internal/repository"
+	"github.com/marmorag/supateam/internal/tracing"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
@@ -13,17 +14,50 @@ import (
 
 type UserRouteHandler struct{}
 
-func (UserRouteHandler) Register(app fiber.Router) {
+func (s UserRouteHandler) Register(app fiber.Router) {
 	usersApi := app.Group("/users")
 
-	usersApi.Get("/", auth.Authenticated(), getUsers)
-	usersApi.Get("/:id", auth.Authenticated(), getUser)
-	usersApi.Get("/:id/participations", auth.Authenticated(), getUserParticipation)
-	usersApi.Post("", auth.Authenticated(), createUser)
-	usersApi.Put("/:id", auth.Authenticated(), updateUser)
-	usersApi.Delete("/:id", auth.Authenticated(), deleteUser)
+	usersApi.Get("/",
+		auth.Authenticated(),
+		tracing.HandlerTracer("get-users"),
+		getUsers,
+	)
+	usersApi.Get("/:id",
+		auth.Authenticated(),
+		tracing.HandlerTracer("get-user"),
+		getUser,
+	)
+	usersApi.Get("/:id/participations",
+		auth.Authenticated(),
+		tracing.HandlerTracer("get-user-participations"),
+		getUserParticipation,
+	)
+	usersApi.Post("",
+		auth.Authenticated(),
+		auth.Authorized(auth.UsersApiGroup, auth.WriteAction),
+		tracing.HandlerTracer("create-user"),
+		createUser,
+	)
+	usersApi.Put("/:id",
+		auth.Authenticated(),
+		auth.Authorized(auth.UsersApiGroup, auth.UpdateSelfAction),
+		tracing.HandlerTracer("update-user"),
+		updateUser,
+	)
+	usersApi.Delete("/:id",
+		auth.Authenticated(),
+		auth.Authorized(auth.UsersApiGroup, auth.DeleteAction),
+		tracing.HandlerTracer("delete-user"),
+		deleteUser,
+	)
 
 	log.Println("Registered users api group.")
+}
+
+// Vote implement SelfActionHandler
+// Check that a user can do anything that relate to him.
+func (UserRouteHandler) Vote(userId string, entityId string) bool {
+	return userId == entityId
 }
 
 // getUsers godoc

@@ -16,36 +16,31 @@ type UserRouteHandler struct{}
 
 func (s UserRouteHandler) Register(app fiber.Router) {
 	usersApi := app.Group("/users")
+	usersApi.Use(auth.Authenticated())
 
 	usersApi.Get("/",
-		auth.Authenticated(),
 		tracing.HandlerTracer("get-users"),
 		getUsers,
 	)
 	usersApi.Get("/:id",
-		auth.Authenticated(),
 		tracing.HandlerTracer("get-user"),
 		getUser,
 	)
 	usersApi.Get("/:id/participations",
-		auth.Authenticated(),
 		tracing.HandlerTracer("get-user-participations"),
 		getUserParticipation,
 	)
 	usersApi.Post("",
-		auth.Authenticated(),
 		auth.Authorized(auth.UsersApiGroup, auth.WriteAction),
 		tracing.HandlerTracer("create-user"),
 		createUser,
 	)
 	usersApi.Put("/:id",
-		auth.Authenticated(),
-		auth.Authorized(auth.UsersApiGroup, auth.UpdateSelfAction),
+		auth.Authorized(auth.UsersApiGroup, auth.UpdateSelfAction, s),
 		tracing.HandlerTracer("update-user"),
 		updateUser,
 	)
 	usersApi.Delete("/:id",
-		auth.Authenticated(),
 		auth.Authorized(auth.UsersApiGroup, auth.DeleteAction),
 		tracing.HandlerTracer("delete-user"),
 		deleteUser,
@@ -56,7 +51,7 @@ func (s UserRouteHandler) Register(app fiber.Router) {
 
 // Vote implement SelfActionHandler
 // Check that a user can do anything that relate to him.
-func (UserRouteHandler) Vote(userId string, entityId string) bool {
+func (UserRouteHandler) Vote(ctx *fiber.Ctx, userId string, entityId string) bool {
 	return userId == entityId
 }
 

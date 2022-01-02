@@ -16,46 +16,37 @@ type EventRouteHandler struct{}
 
 func (EventRouteHandler) Register(app fiber.Router) {
 	eventsApi := app.Group("/events")
+	eventsApi.Use(auth.Authenticated())
 
 	eventsApi.Get("/",
-		auth.Authenticated(),
 		tracing.HandlerTracer("get-events"),
 		getEvents,
 	)
 	eventsApi.Get("/:id",
-		auth.Authenticated(),
 		tracing.HandlerTracer("get-event"),
 		getEvent,
 	)
 	eventsApi.Get("/:id/participations",
-		auth.Authenticated(),
 		tracing.HandlerTracer("get-event-participation"),
 		getEventParticipation,
 	)
 	eventsApi.Post("",
-		auth.Authenticated(),
 		auth.Authorized(auth.EventsApiGroup, auth.WriteAction),
 		tracing.HandlerTracer("create-event"),
 		createEvent,
 	)
 	eventsApi.Put("/:id",
-		auth.Authenticated(),
 		auth.Authorized(auth.EventsApiGroup, auth.UpdateAction),
 		tracing.HandlerTracer("update-event"),
 		updateEvent,
 	)
 	eventsApi.Delete("/:id",
-		auth.Authenticated(),
 		auth.Authorized(auth.EventsApiGroup, auth.DeleteAction),
 		tracing.HandlerTracer("delete-event"),
 		deleteEvent,
 	)
 
 	log.Println("Registered events api group.")
-}
-
-func (h EventRouteHandler) Vote(userId string, entityId string) bool {
-	return true
 }
 
 // getEvents godoc

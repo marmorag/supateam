@@ -63,7 +63,7 @@ func (a ApiAction) S() string {
 }
 
 type SelfActionHandler interface {
-	Vote(userId string, entityId string) bool
+	Vote(ctx *fiber.Ctx, userId string, entityId string) bool
 }
 
 func Authorized(api ApiGroups, action ApiAction, handlers ...SelfActionHandler) fiber.Handler {
@@ -104,7 +104,7 @@ func enforce(claims ApplicationClaim, api ApiGroups, action ApiAction, ctx *fibe
 
 		isEnforced := false
 		for _, handler := range handlers {
-			isEnforced = isEnforced || handler.Vote(claims.UserId, entityId)
+			isEnforced = isEnforced || handler.Vote(ctx, claims.UserId, entityId)
 		}
 		return isEnforced, nil
 	}

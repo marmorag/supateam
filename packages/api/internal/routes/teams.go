@@ -14,31 +14,27 @@ type TeamRouteHandler struct{}
 
 func (TeamRouteHandler) Register(app fiber.Router) {
 	teamsApi := app.Group("/teams")
+	teamsApi.Use(auth.Authenticated())
 
 	teamsApi.Get("/",
-		auth.Authenticated(),
 		tracing.HandlerTracer("get-teams"),
 		getTeams,
 	)
 	teamsApi.Get("/:id",
-		auth.Authenticated(),
 		tracing.HandlerTracer("get-team"),
 		getTeam,
 	)
 	teamsApi.Post("",
-		auth.Authenticated(),
 		auth.Authorized(auth.TeamsApiGroup, auth.WriteAction),
 		tracing.HandlerTracer("create-team"),
 		createTeam,
 	)
 	teamsApi.Put("/:id",
-		auth.Authenticated(),
 		auth.Authorized(auth.TeamsApiGroup, auth.UpdateAction),
 		tracing.HandlerTracer("update-team"),
 		updateTeam,
 	)
 	teamsApi.Delete("/:id",
-		auth.Authenticated(),
 		auth.Authorized(auth.TeamsApiGroup, auth.DeleteAction),
 		tracing.HandlerTracer("delete-team"),
 		deleteTeam,

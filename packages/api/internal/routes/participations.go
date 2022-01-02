@@ -7,38 +7,35 @@ import (
 	"github.com/marmorag/supateam/internal/models"
 	"github.com/marmorag/supateam/internal/repository"
 	"github.com/marmorag/supateam/internal/tracing"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
 )
 
 type ParticipationRouteHandler struct{}
 
-func (ParticipationRouteHandler) Register(app fiber.Router) {
+func (h ParticipationRouteHandler) Register(app fiber.Router) {
 	participationsApi := app.Group("/participations")
+	participationsApi.Use(auth.Authenticated())
 
 	participationsApi.Get("/",
-		auth.Authenticated(),
 		tracing.HandlerTracer("get-participations"),
 		getParticipations,
 	)
 	participationsApi.Get("/:id",
-		auth.Authenticated(),
 		tracing.HandlerTracer("get-participation"),
 		getParticipation,
 	)
 	participationsApi.Post("",
-		auth.Authenticated(),
-		auth.Authorized(auth.ParticipationsApiGroup, auth.WriteSelfAction),
+		auth.Authorized(auth.ParticipationsApiGroup, auth.WriteSelfAction, h),
 		tracing.HandlerTracer("create-participation"),
 		createParticipation,
 	)
 	participationsApi.Put("/:id",
-		auth.Authenticated(),
-		auth.Authorized(auth.ParticipationsApiGroup, auth.UpdateSelfAction),
+		auth.Authorized(auth.ParticipationsApiGroup, auth.UpdateSelfAction, h),
 		tracing.HandlerTracer("update-participation"),
 		updateParticipation,
 	)
 	participationsApi.Delete("/:id",
-		auth.Authenticated(),
 		auth.Authorized(auth.ParticipationsApiGroup, auth.DeleteAction),
 		tracing.HandlerTracer("delete-participation"),
 		deleteParticipation,
@@ -47,8 +44,19 @@ func (ParticipationRouteHandler) Register(app fiber.Router) {
 	log.Println("Registered participations api group.")
 }
 
-func (h ParticipationRouteHandler) Vote(userId string, entityId string) bool {
-	return true
+// Vote implement SelfActionHandler
+// Check that a user can do anything that relate to him.
+func (h ParticipationRouteHandler) Vote(ctx *fiber.Ctx, userId string, entityId string) bool {
+	requestId := ctx.Locals(internal.GetConfig().RequestIDKey).(string)
+	er := repository.NewParticipationRepository(requestId)
+
+	participation, err := er.FindOneById(entityId)
+	if err != nil {
+		return false
+	}
+
+	uId, _ := primitive.ObjectIDFromHex(userId)
+	return participation.Player == uId
 }
 
 // getParticipations godoc

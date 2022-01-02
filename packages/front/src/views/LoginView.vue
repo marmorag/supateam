@@ -45,7 +45,7 @@ const handleConnect = async () => {
 
   const { status, data } = await authService.authenticate({ identity: phoneNumber.value })
   if (status) {
-    store.dispatch("auth/authenticate", { user: jwtDecode(data) })
+    store.dispatch("auth/authenticate", { user: jwtDecode(data), token: data })
     store.dispatch("service/setAuthenticationToken", { token: data})
 
     router.push({ name: "calendar" });

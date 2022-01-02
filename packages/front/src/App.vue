@@ -18,7 +18,13 @@ import TheNavbar from "./components/TheNavbar.vue";
 
 onBeforeMount(() => {
   const store = useStore();
-  store.dispatch("service/init");
+
+  if (store.getters["auth/isAuthenticated"]) {
+    const token = store.getters["auth/getAuthToken"]
+    store.dispatch("service/setAuthenticationToken", { token })
+  } else {
+    store.dispatch("service/init");
+  }
 })
 
 </script>

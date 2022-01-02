@@ -134,7 +134,22 @@ const handleCreateEvent = async () => {
   const { status, data } = await createEvent(eventToCreate);
   if (!status) {
     console.log(data);
+    return
   }
+
+  resetForm()
+};
+
+const resetForm = () => {
+  event.value.Title = ""
+  event.value.Description = ""
+  event.value.Date = new Date()
+  event.value.Duration = 1
+  event.value.Kind = ""
+  event.value.Players = []
+  event.value.Teams = []
+
+  v$.value.$reset()
 };
 </script>
 

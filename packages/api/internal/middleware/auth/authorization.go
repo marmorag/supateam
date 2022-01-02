@@ -76,15 +76,15 @@ func Authorized(api ApiGroups, action ApiAction, handlers ...SelfActionHandler) 
 		token := ctx.Locals("user").(*jwt.Token)
 		claims := token.Claims.(*ApplicationClaim)
 
-		span.SetTag("claims", claims)
-		span.SetTag("user", claims.UserId)
+		tracing.SetTag(span, "claims", claims)
+		tracing.SetTag(span, "user", claims.UserId)
 
 		if enforced, _ := enforce(*claims, api, action, ctx, handlers); enforced {
-			span.Finish()
+			tracing.End(span)
 			return ctx.Next()
 		}
 
-		span.Finish()
+		tracing.End(span)
 		return ctx.SendStatus(fiber.StatusForbidden)
 	}
 }

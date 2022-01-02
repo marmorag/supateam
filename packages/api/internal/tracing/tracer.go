@@ -80,3 +80,9 @@ func End(span opentracing.Span) error {
 
 	return nil
 }
+
+func SetTag(span opentracing.Span, key string, value interface{}) {
+	if internal.GetConfig().TracingEnabled {
+		span.SetTag(key, value)
+	}
+}

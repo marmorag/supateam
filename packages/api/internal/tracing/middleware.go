@@ -26,7 +26,7 @@ func GetTracingMiddleware() fiber.Handler {
 			return "HTTP " + ctx.Method() + " URL: " + path
 		},
 		Filter: func(ctx *fiber.Ctx) bool {
-			return strings.HasPrefix(ctx.Path(), "/api/healthcheck") || ctx.Method() == fiber.MethodOptions
+			return strings.HasPrefix(ctx.Path(), "/api/healthz") || ctx.Method() == fiber.MethodOptions
 		},
 		Modify: func(ctx *fiber.Ctx, span opentracing.Span) {
 			span.SetTag("http.method", ctx.Method()) // GET, POST

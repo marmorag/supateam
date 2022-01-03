@@ -91,6 +91,7 @@ import useEvents from "../../services/events";
 import useUsers from "../../services/users";
 import useTeams from "../../services/teams";
 import useAppDisplay from "../../services/display";
+import { notify } from "@kyvg/vue3-notification";
 
 const { isMobile } = useAppDisplay();
 const router = useRouter();
@@ -131,10 +132,17 @@ const handleCreateEvent = async () => {
 
   const { status, data } = await createEvent(eventToCreate);
   if (!status) {
-    console.log(data);
-    return
+    notify({
+      title: "Impossible de créer l'évènement.",
+      type: "error"
+    });
+    throw Error(data)
   }
 
+  notify({
+    title: "L'évènement a bien été créé.",
+    type: "success"
+  });
   resetForm()
 };
 

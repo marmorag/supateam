@@ -90,6 +90,7 @@ import useEvents from "../../services/events";
 import useUsers from "../../services/users";
 import useTeams from "../../services/teams";
 import useAppDisplay from "../../services/display";
+import { notify } from "@kyvg/vue3-notification";
 
 const { isMobile } = useAppDisplay();
 const store = useStore();
@@ -159,10 +160,17 @@ const handleUpdateEvent = async () => {
 
   const { status, data } = await updateEvent(eventToUpdate);
   if (!status) {
-    console.log(data);
-    return
+    notify({
+      title: "Impossible de mettre à jour l'évènement.",
+      type: "error"
+    });
+    throw Error(data)
   }
 
+  notify({
+    title: "L'évènement a bien été mis à jour.",
+    type: "success"
+  });
   resetForm()
 };
 

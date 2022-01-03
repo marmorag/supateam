@@ -19,6 +19,7 @@
 import { defineProps, defineEmits, computed } from "vue";
 import useParticipations from "../../services/participations";
 import { useStore } from "vuex";
+import { notify } from "@kyvg/vue3-notification";
 
 const store = useStore();
 const { participationStatusStyleMapping, participationStatusList, updateParticipation } = useParticipations(store);
@@ -63,14 +64,22 @@ const handleUpdateParticipation = async (newStatus) => {
     emit('participation:create', { status: newStatus })
     return;
   }
-  console.log(newStatus)
 
   const updatedParticipation = {...props.participation};
   updatedParticipation.status = newStatus;
 
   const { status } = await updateParticipation(updatedParticipation);
   if (status) {
+    notify({
+      title: "La participation à bien été mise à jour.",
+      type: "success"
+    });
     emit('participation:update')
+  } else {
+    notify({
+      title: "Impossible de mettre à jour la participation.",
+      type: "error"
+    });
   }
 };
 </script>

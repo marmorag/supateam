@@ -56,6 +56,7 @@ import useAuthorization from "../../services/authorization";
 import EventKindChip from "./EventKindChip.vue";
 import EventParticipation from "./EventParticipation.vue";
 import useParticipations from "../../services/participations";
+import { notify } from "@kyvg/vue3-notification";
 
 const store = useStore();
 const { authorize, EVENTS_API_GROUP, WRITE_API_ACTION } = useAuthorization(store);
@@ -113,7 +114,16 @@ const handleParticipationCreate = async ({ status }, eventId) => {
 
   const { status: responseStatus } = await createParticipation(participation);
   if (responseStatus) {
+    notify({
+      title: "La participation à bien été mise à jour.",
+      type: "success"
+    });
     emit('participation:refresh');
+  } else {
+    notify({
+      title: "Impossible de mettre à jour la participation.",
+      type: "error"
+    });
   }
 }
 

@@ -56,6 +56,14 @@ export default function useEvents(store, triggerMounted = true) {
     return { status, data };
   };
 
+  const updateEvent = async (event) => {
+    const client = store.getters["service/apiClient"];
+    const eventsApi = new EventsService(client);
+
+    const { status, data } = await eventsApi.put(event);
+    return { status, data };
+  };
+
   const styleEventByKind = (kind) => ({
     backgroundColor: kindColorMapping[kind],
     width: "5px",
@@ -76,6 +84,7 @@ export default function useEvents(store, triggerMounted = true) {
     fetchEvent,
     fetchEventParticipations,
     createEvent,
+    updateEvent,
     styleEventByKind,
   };
 }

@@ -1,8 +1,9 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import LoginView from "../views/LoginView.vue";
 import CalendarView from "../views/CalendarView.vue";
-import EventView from "../views/EventView.vue";
-import CreateEventView from "../views/CreateEventView.vue";
+import EventView from "../views/event/EventView.vue";
+import CreateEventView from "../views/event/CreateEventView.vue";
+import UpdateEventView from "../views/event/UpdateEventView.vue";
 import AdminUsersView from "../views/admin/UsersView.vue";
 import store from "./store";
 
@@ -54,10 +55,21 @@ const router = createRouter({
     },
     {
       name: "create-event",
-      path: "/create-event",
+      path: "/event/create",
       component: CreateEventView,
       meta: {
         title: "Créer un évènement",
+        requireAuthenticated: true,
+        requireAdmin: false,
+      },
+    },
+    {
+      name: "update-event",
+      path: "/event/:id/update",
+      component: UpdateEventView,
+      props: true,
+      meta: {
+        title: "Mettre à jour un évènement",
         requireAuthenticated: true,
         requireAdmin: false,
       },

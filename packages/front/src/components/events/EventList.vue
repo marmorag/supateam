@@ -13,7 +13,7 @@
                 <EventKindChip :kind="event.kind" />
               </v-col>
               <v-col class="d-flex flex-row-reverse">
-                <v-btn v-if="canEditEvent" icon="mdi-calendar-edit" size="small" class="mr-2" />
+                <v-btn v-if="canEditEvent" icon="mdi-calendar-edit" size="small" class="mr-2" :to="{ name: 'update-event', params: { id: event.id } }" />
                 <v-btn icon="mdi-calendar-search" size="small" :to="{ name: 'event', params: { id: event.id } }" />
               </v-col>
             </v-row>
@@ -52,10 +52,10 @@ import { computed, defineProps, defineEmits } from "vue";
 import { isSameMonth, isSameYear, setMonth, setYear, format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useStore } from "vuex";
-import useAuthorization from "../services/authorization";
+import useAuthorization from "../../services/authorization";
 import EventKindChip from "./EventKindChip.vue";
 import EventParticipation from "./EventParticipation.vue";
-import useParticipations from "../services/participations";
+import useParticipations from "../../services/participations";
 
 const store = useStore();
 const { authorize, EVENTS_API_GROUP, WRITE_API_ACTION } = useAuthorization(store);

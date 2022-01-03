@@ -10,12 +10,13 @@ export default function useTeams(store, triggerMounted = true) {
 
     const { status, data } = await eventsApi.get();
     if (status) {
-      teams.value = data;
+      return data;
     }
+    return null;
   };
 
   if (triggerMounted) {
-    onMounted(fetchTeams);
+    onMounted(async () => (teams.value = await fetchTeams()));
   }
 
   return {

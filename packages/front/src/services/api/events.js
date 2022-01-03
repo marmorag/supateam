@@ -41,4 +41,13 @@ export default class EventsService {
       data: response.data,
     };
   }
+
+  async put(event) {
+    const response = await this.client.put(`${this.apiUrl}/${event.Id}`, event);
+
+    return {
+      status: response.status === 201,
+      data: response.data,
+    };
+  }
 }

@@ -9,10 +9,10 @@
 
 <script setup>
 import { defineProps, onMounted, ref } from "vue";
-import ThePageTitle from "../components/ThePageTitle.vue";
+import ThePageTitle from "../../components/ThePageTitle.vue";
 import { useStore } from "vuex";
-import useEvents from "../services/events";
-import EventDisplay from "../components/EventDisplay.vue";
+import useEvents from "../../services/events";
+import EventDisplay from "../../components/events/EventDisplay.vue";
 
 const store = useStore();
 const { fetchEvent, fetchEventParticipations } = useEvents(store, false);

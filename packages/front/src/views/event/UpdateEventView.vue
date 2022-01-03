@@ -1,4 +1,4 @@
-<template class="create-event-view">
+<template class="update-event-view">
   <ThePageTitle offset="2" />
   <v-row>
     <v-col md="8" offset-md="2" sm="10" offset-sm="1" class="pa-5">
@@ -66,10 +66,10 @@
       </v-row>
       <v-row class="d-flex flex-row-reverse">
         <v-col cols="4" class="d-flex flex-row-reverse pa-0">
-          <v-btn class="ml-4" append-icon="mdi-check" color="primary" @click="handleCreateEvent">
-            créer
+          <v-btn class="ml-4" append-icon="mdi-check" color="primary" @click="handleUpdateEvent">
+            Mise à jour
           </v-btn>
-          <v-btn @click="router.back()">
+          <v-btn :to="{ name: 'calendar' }">
             annuler
           </v-btn>
         </v-col>
@@ -79,28 +79,56 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { defineProps, onMounted, ref } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { DatePicker } from "v-calendar";
 import useVuelidate from "@vuelidate/core";
 import { integer, required } from "@vuelidate/validators";
-import ThePageTitle from "../components/ThePageTitle.vue";
-import ChipSelection from "../components/ChipSelection.vue";
-import useEvents from "../services/events";
-import useUsers from "../services/users";
-import useTeams from "../services/teams";
-import { useDisplay } from "vuetify";
+import ThePageTitle from "../../components/ThePageTitle.vue";
+import ChipSelection from "../../components/ChipSelection.vue";
+import useEvents from "../../services/events";
+import useUsers from "../../services/users";
+import useTeams from "../../services/teams";
+import useAppDisplay from "../../services/display";
 
-const display = useDisplay();
-const router = useRouter();
+const { isMobile } = useAppDisplay();
 const store = useStore();
-const { eventKindList, createEvent } = useEvents(store, false);
-const { users } = useUsers(store);
-const { teams } = useTeams(store);
+const { eventKindList, fetchEvent, updateEvent } = useEvents(store, false);
+const { fetchUsers } = useUsers(store, false);
+const { fetchTeams } = useTeams(store, false);
 
-const eventKind = (value) => eventKindList.includes(value);
+const props = defineProps({
+  id: {
+    type: String,
+    required: true,
+  }
+})
 
+onMounted(async () => {
+  Promise.all([
+    fetchUsers(),
+    fetchTeams(),
+    fetchEvent(props.id)
+  ]).then(([fetchedUsers, fetchedTeams, fetchedEvent]) => {
+    console.log(fetchedEvent);
+    users.value = fetchedUsers
+    teams.value = fetchedTeams
+    event.value = {
+      Id: fetchedEvent.id,
+      Title: fetchedEvent.title,
+      Description: fetchedEvent.description,
+      Date: new Date(fetchedEvent.date),
+      Duration: fetchedEvent.duration,
+      Kind: fetchedEvent.kind,
+      Players: fetchedEvent.players.map((p) => fetchedUsers.find((fp) => p === fp.id)),
+      Teams: fetchedEvent.teams.map((t) => fetchedTeams.find((ft) => t === ft.id)),
+    }
+  })
+})
+
+const users = ref([])
+const teams = ref([])
 const event = ref({
   Title: "",
   Description: "",
@@ -111,8 +139,7 @@ const event = ref({
   Teams: [],
 });
 
-const isMobile = computed(() => display.mobile.value)
-
+const eventKind = (value) => eventKindList.includes(value);
 const rules = {
   Title: { required },
   Description: {},
@@ -122,16 +149,16 @@ const rules = {
 };
 const v$ = useVuelidate(rules, event);
 
-const handleCreateEvent = async () => {
+const handleUpdateEvent = async () => {
   if (!await v$.value.$validate()) {
     return;
   }
 
-  const eventToCreate = { ...event.value };
-  eventToCreate.Players = eventToCreate.Players.map((player) => player.id);
-  eventToCreate.Teams = eventToCreate.Teams.map((team) => team.id);
+  const eventToUpdate = { ...event.value };
+  eventToUpdate.Players = eventToUpdate.Players.map((player) => player.id);
+  eventToUpdate.Teams = eventToUpdate.Teams.map((team) => team.id);
 
-  const { status, data } = await createEvent(eventToCreate);
+  const { status, data } = await updateEvent(eventToUpdate);
   if (!status) {
     console.log(data);
     return

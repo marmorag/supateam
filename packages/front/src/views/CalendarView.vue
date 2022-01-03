@@ -32,7 +32,7 @@ import { computed, onMounted, ref } from "vue";
 import { useStore } from "vuex";
 import { Calendar } from "v-calendar";
 import useEvents from "../services/events";
-import EventList from "../components/EventList.vue";
+import EventList from "../components/events/EventList.vue";
 import ThePageTitle from "../components/ThePageTitle.vue";
 import useUsers from "../services/users";
 

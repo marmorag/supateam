@@ -4,7 +4,7 @@
 
 <script setup>
 import { defineProps } from "vue";
-import useEvents from "../services/events";
+import useEvents from "../../services/events";
 
 const { kindColorMapping } = useEvents(null, false);
 

@@ -52,9 +52,9 @@ import { computed, defineEmits, defineProps } from "vue";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import EventParticipation from "./EventParticipation.vue";
-import useEvents from "../services/events";
-import useAuthorization from "../services/authorization";
-import store from "../plugins/store";
+import useEvents from "../../services/events";
+import useAuthorization from "../../services/authorization";
+import store from "../../plugins/store";
 
 const { authorize, PARTICIPATIONS_API_GROUP, WRITE_API_ACTION } = useAuthorization(store)
 const { kindColorMapping } = useEvents(null, false)

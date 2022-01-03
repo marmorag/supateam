@@ -17,7 +17,7 @@
 
 <script setup>
 import { defineProps, defineEmits, computed } from "vue";
-import useParticipations from "../services/participations";
+import useParticipations from "../../services/participations";
 import { useStore } from "vuex";
 
 const store = useStore();

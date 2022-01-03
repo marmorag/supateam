@@ -58,14 +58,14 @@
 <script setup>
 import { computed, ref } from "vue";
 import { useStore } from "vuex";
-import { useDisplay } from "vuetify";
 import useAuthorization from "../services/authorization";
 import { useRouter } from "vue-router";
+import useAppDisplay from "../services/display";
 
 const router = useRouter();
 const store = useStore();
 const { authorize, USERS_API_GROUP, EVENTS_API_GROUP, WRITE_API_ACTION, ALL_API_ACTION } = useAuthorization(store);
-const display = useDisplay();
+const { isMobile } = useAppDisplay();
 
 const adminLink = [
   {
@@ -87,7 +87,6 @@ const isAuthenticated = computed(() => {
 
 const canCreateEvent = computed(() => authorize({ api: EVENTS_API_GROUP, action: WRITE_API_ACTION }) || false);
 const isAdmin = computed(() => authorize({ api: USERS_API_GROUP, action: ALL_API_ACTION }) || false);
-const isMobile = computed(() => display.mobile.value)
 
 const toggleDrawer = () => {
   drawer.value = !drawer.value

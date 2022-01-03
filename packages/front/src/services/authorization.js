@@ -1,14 +1,35 @@
 export default function useAuthorization(store) {
   const EVENTS_API_GROUP = "events";
   const USERS_API_GROUP = "users";
+  const PARTICIPATIONS_API_GROUP = "participations";
+  const TEAMS_API_GROUP = "teams";
 
-  const validApiGroup = [EVENTS_API_GROUP, USERS_API_GROUP];
+  const validApiGroup = [
+    EVENTS_API_GROUP,
+    USERS_API_GROUP,
+    PARTICIPATIONS_API_GROUP,
+    TEAMS_API_GROUP,
+  ];
 
   const ALL_API_ACTION = "*";
-  const READ_API_ACTION = "*";
-  const WRITE_API_ACTION = "*";
+  const READ_API_ACTION = "read";
+  const READ_SELF_API_ACTION = "read:self";
+  const WRITE_API_ACTION = "write";
+  const WRITE_SELF_API_ACTION = "write:self";
+  const UPDATE_API_ACTION = "update";
+  const UPDATE_SELF_API_ACTION = "update:self";
+  const DELETE_API_ACTION = "delete";
 
-  const validApiAction = [ALL_API_ACTION, READ_API_ACTION, WRITE_API_ACTION];
+  const validApiAction = [
+    ALL_API_ACTION,
+    READ_API_ACTION,
+    READ_SELF_API_ACTION,
+    WRITE_API_ACTION,
+    WRITE_SELF_API_ACTION,
+    UPDATE_API_ACTION,
+    UPDATE_SELF_API_ACTION,
+    DELETE_API_ACTION,
+  ];
 
   const unproxyfy = (proxy) => JSON.parse(JSON.stringify(proxy));
 
@@ -26,7 +47,7 @@ export default function useAuthorization(store) {
     );
     return (
       userAuthorizations[api].includes(action) ||
-      userAuthorizations[api].includes("*")
+      userAuthorizations[api].includes(ALL_API_ACTION)
     );
   };
 
@@ -34,8 +55,15 @@ export default function useAuthorization(store) {
     authorize,
     EVENTS_API_GROUP,
     USERS_API_GROUP,
+    PARTICIPATIONS_API_GROUP,
+    TEAMS_API_GROUP,
     ALL_API_ACTION,
     READ_API_ACTION,
+    READ_SELF_API_ACTION,
     WRITE_API_ACTION,
+    WRITE_SELF_API_ACTION,
+    UPDATE_API_ACTION,
+    UPDATE_SELF_API_ACTION,
+    DELETE_API_ACTION,
   };
 }

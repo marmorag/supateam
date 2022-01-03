@@ -5,6 +5,7 @@
       :key="`${participation.id}-${status}`"
       :value="status"
       :color="btnColor(status)"
+      :disabled="disabled"
       @click="handleUpdateParticipation(status)"
     >
       <v-icon :color="iconColor(status)">
@@ -26,6 +27,11 @@ const props = defineProps({
   participation: {
     type: Object,
     required: true
+  },
+  disabled: {
+    type: Boolean,
+    required: false,
+    default: false,
   }
 });
 

@@ -32,7 +32,7 @@
               <td>{{ participation.player[0].name }}</td>
               <td>{{ participation.team[0]?.name }}</td>
               <td>
-                <v-icon>mdi-{{ statusIcon(participation.status) }}</v-icon>
+                <EventParticipation :disabled="!canUpdateParticipation" :participation="simplify(participation)" @participation:update="handleParticipationUpdated"/>
               </td>
             </tr>
           </template>
@@ -48,14 +48,16 @@
 </template>
 
 <script setup>
-import { computed, defineProps } from "vue";
+import { computed, defineEmits, defineProps } from "vue";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import useParticipations from "../services/participations";
+import EventParticipation from "./EventParticipation.vue";
 import useEvents from "../services/events";
+import useAuthorization from "../services/authorization";
+import store from "../plugins/store";
 
+const { authorize, PARTICIPATIONS_API_GROUP, WRITE_API_ACTION } = useAuthorization(store)
 const { kindColorMapping } = useEvents(null, false)
-const { participationStatusStyleMapping } = useParticipations();
 
 const props = defineProps({
   event: {
@@ -68,15 +70,32 @@ const props = defineProps({
   },
 })
 
+const emit = defineEmits(["participation:update"])
+
+const canUpdateParticipation = computed(() => authorize({ api: PARTICIPATIONS_API_GROUP, action: WRITE_API_ACTION }) || false)
+
 const cParticipations = computed(() => {
   return props.participations ?? [];
 })
 
-const statusIcon = (status) => {
-  return participationStatusStyleMapping[status].icon;
-};
-
 const formatDate = (date) => {
   return format(Date.parse(date), "EEEE d LLLL", { locale: fr });
 }
+
+const handleParticipationUpdated = () => {
+  emit("participation:update")
+}
+
+const simplify = (participation) => ({
+  ...participation,
+  player: participation.player[0].id,
+  team: participation.team[0]?.id ?? null,
+})
 </script>
+
+<style scoped>
+td, th {
+  text-align: center !important;
+}
+
+</style>

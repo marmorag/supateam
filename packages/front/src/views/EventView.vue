@@ -2,7 +2,7 @@
   <ThePageTitle offset="2" />
   <v-row>
     <v-col md="8" offset-md="2" sm="10" offset-sm="1">
-      <EventDisplay v-if="loaded" :event="event" :participations="participations"/>
+      <EventDisplay v-if="loaded" :event="event" :participations="participations" @participation:update="handleParticipationUpdate"/>
     </v-col>
   </v-row>
 </template>
@@ -41,5 +41,9 @@ onMounted(async () => {
       loaded.value = true;
     })
 })
+
+const handleParticipationUpdate = async () => {
+  participations.value = await fetchEventParticipations(props.id)
+}
 
 </script>

@@ -11,6 +11,7 @@
               label="N° Téléphone"
               type="text"
               :rules="rules"
+              @keyup.enter="handleConnect"
             />
           </v-form>
         </v-card-text>

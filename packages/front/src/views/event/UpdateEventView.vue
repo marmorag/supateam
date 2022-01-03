@@ -66,7 +66,7 @@
       </v-row>
       <v-row class="d-flex flex-row-reverse">
         <v-col cols="4" class="d-flex flex-row-reverse pa-0">
-          <v-btn class="ml-4" append-icon="mdi-check" color="primary" @click="handleUpdateEvent">
+          <v-btn class="ml-4" append-icon="mdi-check" color="blue lighten-1" text-color="white" @click="handleUpdateEvent">
             Mise à jour
           </v-btn>
           <v-btn :to="{ name: 'calendar' }">
@@ -81,7 +81,6 @@
 <script setup>
 import { defineProps, onMounted, ref } from "vue";
 import { useStore } from "vuex";
-import { useRouter } from "vue-router";
 import { DatePicker } from "v-calendar";
 import useVuelidate from "@vuelidate/core";
 import { integer, required } from "@vuelidate/validators";

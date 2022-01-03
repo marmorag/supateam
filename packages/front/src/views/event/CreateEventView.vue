@@ -66,7 +66,7 @@
       </v-row>
       <v-row class="d-flex flex-row-reverse">
         <v-col cols="4" class="d-flex flex-row-reverse pa-0">
-          <v-btn class="ml-4" append-icon="mdi-check" color="primary" @click="handleCreateEvent">
+          <v-btn class="ml-4" append-icon="mdi-check" color="blue lighten-1" text-color="white" @click="handleCreateEvent">
             créer
           </v-btn>
           <v-btn @click="router.back()">

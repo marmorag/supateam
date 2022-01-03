@@ -216,6 +216,7 @@ func seedEvents() error {
 		Duration:    1,
 		Kind:        models.KindEntrainement,
 		Teams:       []primitive.ObjectID{teamId},
+		Players:     make([]primitive.ObjectID, 0),
 	})
 
 	events = append(events, models.Event{
@@ -225,6 +226,7 @@ func seedEvents() error {
 		Duration:    1,
 		Kind:        models.KindEntrainement,
 		Teams:       []primitive.ObjectID{teamId},
+		Players:     make([]primitive.ObjectID, 0),
 	})
 
 	events = append(events, models.Event{
@@ -234,6 +236,7 @@ func seedEvents() error {
 		Duration:    1,
 		Kind:        models.KindEntrainement,
 		Teams:       []primitive.ObjectID{teamId},
+		Players:     make([]primitive.ObjectID, 0),
 	})
 
 	events = append(events, models.Event{
@@ -243,6 +246,7 @@ func seedEvents() error {
 		Duration:    1,
 		Kind:        models.KindEntrainement,
 		Teams:       []primitive.ObjectID{teamId},
+		Players:     make([]primitive.ObjectID, 0),
 	})
 
 	events = append(events, models.Event{
@@ -252,6 +256,7 @@ func seedEvents() error {
 		Duration:    2,
 		Kind:        models.KindGrandPrix,
 		Teams:       []primitive.ObjectID{teamId},
+		Players:     make([]primitive.ObjectID, 0),
 	})
 
 	events = append(events, models.Event{
@@ -261,6 +266,7 @@ func seedEvents() error {
 		Duration:    3,
 		Kind:        models.KindEquipe,
 		Teams:       []primitive.ObjectID{teamId},
+		Players:     make([]primitive.ObjectID, 0),
 	})
 
 	events = append(events, models.Event{
@@ -270,6 +276,7 @@ func seedEvents() error {
 		Duration:    3,
 		Kind:        models.KindEquipe,
 		Teams:       []primitive.ObjectID{teamId},
+		Players:     make([]primitive.ObjectID, 0),
 	})
 
 	events = append(events, models.Event{
@@ -278,6 +285,8 @@ func seedEvents() error {
 		Date:        primitive.NewDateTimeFromTime(time.Date(2022, time.May, 21, 0, 0, 0, 0, time.UTC)),
 		Duration:    2,
 		Kind:        models.KindGrandPrix,
+		Teams:       make([]primitive.ObjectID, 0),
+		Players:     make([]primitive.ObjectID, 0),
 	})
 
 	events = append(events, models.Event{
@@ -286,6 +295,8 @@ func seedEvents() error {
 		Date:        primitive.NewDateTimeFromTime(time.Date(2022, time.June, 11, 0, 0, 0, 0, time.UTC)),
 		Duration:    2,
 		Kind:        models.KindGrandPrix,
+		Teams:       make([]primitive.ObjectID, 0),
+		Players:     make([]primitive.ObjectID, 0),
 	})
 
 	events = append(events, models.Event{
@@ -294,6 +305,8 @@ func seedEvents() error {
 		Date:        primitive.NewDateTimeFromTime(time.Date(2022, time.July, 2, 0, 0, 0, 0, time.UTC)),
 		Duration:    2,
 		Kind:        models.KindGrandPrix,
+		Teams:       make([]primitive.ObjectID, 0),
+		Players:     make([]primitive.ObjectID, 0),
 	})
 
 	events = append(events, models.Event{
@@ -302,6 +315,8 @@ func seedEvents() error {
 		Date:        primitive.NewDateTimeFromTime(time.Date(2022, time.August, 19, 0, 0, 0, 0, time.UTC)),
 		Duration:    3,
 		Kind:        models.KindGrandPrix,
+		Teams:       make([]primitive.ObjectID, 0),
+		Players:     make([]primitive.ObjectID, 0),
 	})
 
 	events = append(events, models.Event{
@@ -310,6 +325,8 @@ func seedEvents() error {
 		Date:        primitive.NewDateTimeFromTime(time.Date(2022, time.August, 26, 0, 0, 0, 0, time.UTC)),
 		Duration:    3,
 		Kind:        models.KindGrandPrix,
+		Teams:       make([]primitive.ObjectID, 0),
+		Players:     make([]primitive.ObjectID, 0),
 	})
 
 	events = append(events, models.Event{
@@ -318,6 +335,8 @@ func seedEvents() error {
 		Date:        primitive.NewDateTimeFromTime(time.Date(2022, time.September, 9, 0, 0, 0, 0, time.UTC)),
 		Duration:    3,
 		Kind:        models.KindGrandPrix,
+		Teams:       make([]primitive.ObjectID, 0),
+		Players:     make([]primitive.ObjectID, 0),
 	})
 
 	events = append(events, models.Event{
@@ -327,6 +346,7 @@ func seedEvents() error {
 		Duration:    2,
 		Kind:        models.KindEquipe,
 		Teams:       []primitive.ObjectID{teamId},
+		Players:     make([]primitive.ObjectID, 0),
 	})
 
 	events = append(events, models.Event{
@@ -335,6 +355,8 @@ func seedEvents() error {
 		Date:        primitive.NewDateTimeFromTime(time.Date(2022, time.September, 23, 0, 0, 0, 0, time.UTC)),
 		Duration:    3,
 		Kind:        models.KindGrandPrix,
+		Teams:       make([]primitive.ObjectID, 0),
+		Players:     make([]primitive.ObjectID, 0),
 	})
 
 	events = append(events, models.Event{
@@ -343,6 +365,8 @@ func seedEvents() error {
 		Date:        primitive.NewDateTimeFromTime(time.Date(2022, time.October, 1, 0, 0, 0, 0, time.UTC)),
 		Duration:    2,
 		Kind:        models.KindGrandPrix,
+		Teams:       make([]primitive.ObjectID, 0),
+		Players:     make([]primitive.ObjectID, 0),
 	})
 
 	events = append(events, models.Event{
@@ -352,6 +376,7 @@ func seedEvents() error {
 		Duration:    2,
 		Kind:        models.KindEquipe,
 		Teams:       []primitive.ObjectID{teamId},
+		Players:     make([]primitive.ObjectID, 0),
 	})
 
 	er := repository.NewEventRepository("")

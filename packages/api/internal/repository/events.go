@@ -98,6 +98,7 @@ func (er EventRepository) Create(e *models.Event) (*models.Event, error) {
 	defer tracing.End(span)
 
 	e.Id = primitive.NewObjectID()
+	arrayGuard(e)
 
 	_, err := er.Collection.InsertOne(er.Context, e)
 
@@ -127,6 +128,7 @@ func (er EventRepository) Update(id string, e models.UpdateEventRequest) (*model
 	event.Kind = e.Kind
 	event.Teams = e.Teams
 	event.Players = e.Players
+	arrayGuard(event)
 
 	update := bson.M{
 		"$set": event,
@@ -150,4 +152,14 @@ func (er EventRepository) Delete(id string) error {
 	_, err := er.Collection.DeleteOne(er.Context, bson.M{"_id": objID})
 
 	return err
+}
+
+func arrayGuard(event *models.Event) {
+	if event.Players == nil {
+		event.Players = make([]primitive.ObjectID, 0)
+	}
+
+	if event.Teams == nil {
+		event.Teams = make([]primitive.ObjectID, 0)
+	}
 }

@@ -7,10 +7,12 @@ import (
 	"github.com/google/uuid"
 	"github.com/marmorag/supateam/internal"
 	"github.com/opentracing/opentracing-go"
+	"sync"
 )
 
 type SpanProvider struct {
 	spans map[string]*opentracing.Span
+	mu    *sync.Mutex
 }
 
 var provider *SpanProvider
@@ -18,6 +20,7 @@ var provider *SpanProvider
 func NewSpanProvider() *SpanProvider {
 	return &SpanProvider{
 		spans: make(map[string]*opentracing.Span),
+		mu:    &sync.Mutex{},
 	}
 }
 
@@ -30,7 +33,9 @@ func GetProvider() *SpanProvider {
 }
 
 func (p SpanProvider) RegisterSpan(identifier string, span opentracing.Span) {
+	p.mu.Lock()
 	p.spans[identifier] = &span
+	p.mu.Unlock()
 }
 
 func (p SpanProvider) GetSpan(identifier string) *opentracing.Span {
@@ -38,7 +43,9 @@ func (p SpanProvider) GetSpan(identifier string) *opentracing.Span {
 }
 
 func (p SpanProvider) UnregisterSpan(identifier string) {
+	p.mu.Lock()
 	delete(p.spans, identifier)
+	p.mu.Unlock()
 }
 
 func (p SpanProvider) GenerateTransactionIdentifier() uuid.UUID {

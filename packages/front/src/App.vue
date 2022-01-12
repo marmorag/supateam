@@ -6,7 +6,7 @@
         <v-container>
           <router-view />
         </v-container>
-        <notifications max="3"/>
+        <notifications :max="3"/>
       </v-main>
     </v-app>
   </v-layout>

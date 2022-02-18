@@ -15,8 +15,8 @@ func (AuthRouteHandler) Register(app fiber.Router) {
 	authApi := app.Group("/auth")
 
 	authApi.Post("/login",
-		authUser,
 		tracing.HandlerTracer("auth-user"),
+		authUser,
 	)
 
 	log.Println("Registered auth api group.")

@@ -19,6 +19,7 @@ setup:
 
 .PHONY: test
 HELP += $(call help,test,  Run tests)
+test: export APP_ENV_PATH = $(shell pwd)/.env.test
 test:
 	go test -v ./...
 

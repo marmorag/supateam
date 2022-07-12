@@ -24,22 +24,22 @@ func (s BaseSeeder) Seed() error {
 	_ = repository.NewParticipationRepository("").Collection.Drop(context.Background())
 
 	// seed all entities
-	err := seedUsers()
+	err := baseSeedusers()
 	if err != nil {
 		return err
 	}
 
-	err = seedTeams()
+	err = baseSeedTeams()
 	if err != nil {
 		return err
 	}
 
-	err = seedEvents()
+	err = baseSeedEvents()
 	if err != nil {
 		return err
 	}
 
-	err = seedAdmins()
+	err = baseSeedAdmins()
 	if err != nil {
 		return err
 	}
@@ -47,7 +47,7 @@ func (s BaseSeeder) Seed() error {
 	return nil
 }
 
-func seedUsers() error {
+func baseSeedusers() error {
 	users := make([]models.User, 0)
 	dec, err := ReadSecureData("./data.yaml.enc")
 	if err != nil {
@@ -180,7 +180,7 @@ func seedUsers() error {
 	return nil
 }
 
-func seedTeams() error {
+func baseSeedTeams() error {
 	ur := repository.NewUserRepository("")
 	tr := repository.NewTeamRepository("")
 
@@ -204,7 +204,7 @@ func seedTeams() error {
 	return nil
 }
 
-func seedEvents() error {
+func baseSeedEvents() error {
 	events := make([]models.Event, 0)
 	teams, _ := repository.NewTeamRepository("").FindAll()
 	teamId := teams[0].Id
@@ -396,7 +396,7 @@ func seedEvents() error {
 	return nil
 }
 
-func seedAdmins() error {
+func baseSeedAdmins() error {
 	users := make([]models.User, 0)
 	dec, err := ReadSecureData("./data.yaml.enc")
 	if err != nil {

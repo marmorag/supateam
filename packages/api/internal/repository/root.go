@@ -11,7 +11,6 @@ import (
 )
 
 var connection *mongo.Client
-var connectionError error
 
 func GetMongoConnection() *mongo.Client {
 	if connection == nil {

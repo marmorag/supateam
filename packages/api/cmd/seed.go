@@ -9,26 +9,31 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var seederToApply string
+
 func executeSeedCommand() {
 	_ = internal.GetConfig()
 	defer repository.CloseConnection()
 
-	s := seeder.Seeder{}
-	err := s.Seed()
-
-	if err != nil {
-		fmt.Println(err.Error())
+	if s := seeder.Mapping[seeder.Name(seederToApply)]; s != nil {
+		err := s.Seed()
+		if err != nil {
+			fmt.Println(err.Error())
+		}
 	}
 }
 
 var seedCmd = &cobra.Command{
 	Use:   "seed",
-	Short: "Sedd base application",
+	Short: "Apply seed to the database",
 	Run: func(cmd *cobra.Command, args []string) {
 		executeSeedCommand()
 	},
 }
 
 func init() {
+	seedCmd.Flags().StringVarP(&seederToApply, "seeder", "s", "", "Which seeder to apply")
+	seedCmd.MarkFlagRequired("seeder")
+
 	rootCmd.AddCommand(seedCmd)
 }

@@ -77,6 +77,10 @@ func getEnvExtension() string {
 		extension = ".prod"
 	}
 
+	if env := os.Getenv("APP_ENV"); env == "test" {
+		extension = ".test"
+	}
+
 	return extension
 }
 

@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"bytes"
-	"encoding/json"
 	"github.com/marmorag/supateam/internal/seeder"
 	coretesting "github.com/marmorag/supateam/internal/testing"
 	"net/http/httptest"
@@ -50,20 +48,12 @@ func Test_authUser(t *testing.T) {
 	}.Seed()
 
 	for _, tt := range tests {
-		req := httptest.NewRequest("POST", "/api/auth/login", MustSerialize(tt.body))
+		req := httptest.NewRequest("POST", "/api/auth/login", MustSerializeReader(tt.body))
 		req.Header.Add("Content-Type", "application/json")
 
-		resp, _ := app.Test(req, 1)
+		resp, _ := app.Test(req, -1)
 		if resp.StatusCode != tt.expectedCode {
 			t.Errorf("HTTP Status differ : expected(%v) obtained(%v)", tt.expectedCode, resp.StatusCode)
 		}
 	}
-}
-
-func MustSerialize(b AuthRequest) *bytes.Reader {
-	jsonBody, err := json.Marshal(b)
-	if err != nil {
-		panic(err)
-	}
-	return bytes.NewReader(jsonBody)
 }

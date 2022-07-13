@@ -15,7 +15,7 @@ include ../../.make/help.mk
 .PHONY: setup
 HELP += $(call help,setup, Setup the development environment)
 setup:
-	go mod tidy
+	go mod download
 	go install honnef.co/go/tools/cmd/staticcheck@latest
 
 .PHONY: test

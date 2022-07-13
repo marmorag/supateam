@@ -15,7 +15,8 @@ include ../../.make/help.mk
 .PHONY: setup
 HELP += $(call help,setup, Setup the development environment)
 setup:
-	go install honnef.co/go/tools/cmd/staticcheck github.com/swaggo/swag/cmd/swag
+	go install honnef.co/go/tools/cmd/staticcheck@latest
+	go install github.com/swaggo/swag/cmd/swag@latest
 
 .PHONY: test
 HELP += $(call help,test,  Run tests)
@@ -38,6 +39,5 @@ clean:
 
 .PHONY: swagger
 HELP += $(call help,test,  Run tests)
-swagger:
-	go install github.com/swaggo/swag/cmd/swag
+swagger: setup
 	swag init --parseDependency

@@ -1,14 +1,47 @@
 name: CI
 
 on:
-  push:
-    branches: [master]
+  push: {}
 
 env:
   TZ: UTC
 
 jobs:
+  tests:
+    strategy:
+      matrix:
+        go: [1.18.x]
+    runs-on: ubuntu-latest
+    services:
+      supateam-database-mongo:
+        image: mongo:5-focal
+        ports:
+          - "27017:27017"
+        env:
+          MONGO_INITDB_ROOT_USERNAME: supateam
+          MONGO_INITDB_ROOT_PASSWORD: supateam
+          MONGO_INITDB_DATABASE: supateam
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go }}
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('packages/api/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - run: make test
+        shell: bash
+        working-directory: packages/api
+
   release:
+    if: ${{ github.ref == 'refs/heads/master' }}
     outputs:
       tag: ${{ steps.new_tag.outputs.next_version }}
     runs-on: ubuntu-latest

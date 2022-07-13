@@ -17,6 +17,7 @@ HELP += $(call help,setup, Setup the development environment)
 setup:
 	go mod download
 	go install honnef.co/go/tools/cmd/staticcheck@latest
+	go install github.com/swaggo/swag@v1.8.3
 
 .PHONY: test
 HELP += $(call help,test,  Run tests)

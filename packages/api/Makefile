@@ -39,4 +39,5 @@ clean:
 .PHONY: swagger
 HELP += $(call help,test,  Run tests)
 swagger:
+	go install github.com/swaggo/swag/cmd/swag
 	swag init --parseDependency

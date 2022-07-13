@@ -12,23 +12,33 @@ import (
 func Test_authUser(t *testing.T) {
 	tests := []struct {
 		name         string
-		identity     string
+		body         AuthRequest
 		expectedCode int
 	}{
 		{
 			name:         "test can login - admin user",
-			identity:     "0600000001",
+			body:         AuthRequest{"0600000001"},
 			expectedCode: 200,
 		},
 		{
 			name:         "test can login - normal user",
-			identity:     "0600000002",
+			body:         AuthRequest{"0600000002"},
 			expectedCode: 200,
 		},
 		{
 			name:         "test can login - user with no access",
-			identity:     "0600000003",
+			body:         AuthRequest{"0600000003"},
 			expectedCode: 200,
+		},
+		{
+			name:         "test can't login - user not known",
+			body:         AuthRequest{"0600000000"},
+			expectedCode: 404,
+		},
+		{
+			name:         "test can't login - Identity not provided",
+			body:         AuthRequest{},
+			expectedCode: 400,
 		},
 	}
 
@@ -40,12 +50,7 @@ func Test_authUser(t *testing.T) {
 	}.Seed()
 
 	for _, tt := range tests {
-		authBody := AuthRequest{
-			Identity: tt.identity,
-		}
-		jsonBody, _ := json.Marshal(authBody)
-
-		req := httptest.NewRequest("POST", "/api/auth/login", bytes.NewReader(jsonBody))
+		req := httptest.NewRequest("POST", "/api/auth/login", MustSerialize(tt.body))
 		req.Header.Add("Content-Type", "application/json")
 
 		resp, _ := app.Test(req, 1)
@@ -53,4 +58,12 @@ func Test_authUser(t *testing.T) {
 			t.Errorf("HTTP Status differ : expected(%v) obtained(%v)", tt.expectedCode, resp.StatusCode)
 		}
 	}
+}
+
+func MustSerialize(b AuthRequest) *bytes.Reader {
+	jsonBody, err := json.Marshal(b)
+	if err != nil {
+		panic(err)
+	}
+	return bytes.NewReader(jsonBody)
 }

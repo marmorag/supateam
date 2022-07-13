@@ -23,7 +23,7 @@ func (AuthRouteHandler) Register(app fiber.Router) {
 }
 
 type AuthRequest struct {
-	Identity string `validate:"required"`
+	Identity string `validate:"required" json:"Identity,omitempty"`
 }
 
 // authUser godoc

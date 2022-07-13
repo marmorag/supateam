@@ -15,8 +15,8 @@ include ../../.make/help.mk
 .PHONY: setup
 HELP += $(call help,setup, Setup the development environment)
 setup:
+	go mod tidy
 	go install honnef.co/go/tools/cmd/staticcheck@latest
-	go install github.com/swaggo/swag/cmd/swag@latest
 
 .PHONY: test
 HELP += $(call help,test,  Run tests)

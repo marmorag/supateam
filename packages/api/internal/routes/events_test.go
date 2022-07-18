@@ -88,6 +88,7 @@ func Test_createEvent(t *testing.T) {
 		}
 
 		if resp.StatusCode != tt.expectedCode {
+			t.Logf("found error at : %s", tt.name)
 			t.Errorf("HTTP Status differ : expected(%v) obtained(%v)", tt.expectedCode, resp.StatusCode)
 		}
 	}
@@ -141,6 +142,7 @@ func Test_deleteEvent(t *testing.T) {
 		}
 
 		if resp.StatusCode != tt.expectedCode {
+			t.Logf("found error at : %s", tt.name)
 			t.Errorf("HTTP Status differ : expected(%v) obtained(%v)", tt.expectedCode, resp.StatusCode)
 		}
 	}

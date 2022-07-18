@@ -7,7 +7,6 @@ import (
 	"github.com/marmorag/supateam/internal"
 	"github.com/marmorag/supateam/internal/tracing"
 	"github.com/opentracing/opentracing-go"
-	"regexp"
 )
 
 type ApiGroups string
@@ -64,6 +63,7 @@ func (a ApiAction) S() string {
 
 type SelfActionHandler interface {
 	Vote(ctx *fiber.Ctx, userId string, entityId string) bool
+	ExtractEntityId(ctx *fiber.Ctx) (string, error)
 }
 
 func Authorized(api ApiGroups, action ApiAction, handlers ...SelfActionHandler) fiber.Handler {
@@ -90,17 +90,26 @@ func Authorized(api ApiGroups, action ApiAction, handlers ...SelfActionHandler) 
 }
 
 func enforce(claims ApplicationClaim, api ApiGroups, action ApiAction, ctx *fiber.Ctx, handlers []SelfActionHandler) (bool, error) {
+	// user has authorization superior to required ones
 	if elevated := getElevated(action); contains(claims.UserAuthorization[api], elevated) || contains(claims.UserAuthorization[api], AllAction) {
 		return true, nil
 	}
 
+	// action is self one and require advanced behavior
 	if isSelfApiAction(action) {
+		// user auths don't have self:
+		if !contains(claims.UserAuthorization[api], action) {
+			return false, nil
+		}
 
 		if len(handlers) == 0 {
 			return false, errors.New("no handlers for a self managed entity")
 		}
 
-		entityId := extractEntityId(ctx)
+		entityId := ""
+		for _, handler := range handlers {
+			entityId, _ = handler.ExtractEntityId(ctx)
+		}
 
 		isEnforced := false
 		for _, handler := range handlers {
@@ -110,11 +119,6 @@ func enforce(claims ApplicationClaim, api ApiGroups, action ApiAction, ctx *fibe
 	}
 
 	return contains(claims.UserAuthorization[api], action), nil
-}
-
-func extractEntityId(ctx *fiber.Ctx) string {
-	rg := regexp.MustCompile(`([[:xdigit:]]{24})`)
-	return rg.FindString(ctx.Path())
 }
 
 func contains(a []ApiAction, x ApiAction) bool {

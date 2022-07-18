@@ -53,6 +53,7 @@ func Test_authUser(t *testing.T) {
 
 		resp, _ := app.Test(req, -1)
 		if resp.StatusCode != tt.expectedCode {
+			t.Logf("found error at : %s", tt.name)
 			t.Errorf("HTTP Status differ : expected(%v) obtained(%v)", tt.expectedCode, resp.StatusCode)
 		}
 	}

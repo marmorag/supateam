@@ -7,7 +7,6 @@ import (
 	"github.com/marmorag/supateam/internal/models"
 	"github.com/marmorag/supateam/internal/repository"
 	"github.com/marmorag/supateam/internal/tracing"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
 )
 
@@ -26,12 +25,12 @@ func (h ParticipationRouteHandler) Register(app fiber.Router) {
 		getParticipation,
 	)
 	participationsApi.Post("",
-		auth.Authorized(auth.ParticipationsApiGroup, auth.WriteSelfAction, h),
+		auth.Authorized(auth.ParticipationsApiGroup, auth.WriteSelfAction, ParticipationPostActionHandler{}),
 		tracing.HandlerTracer("create-participation"),
 		createParticipation,
 	)
 	participationsApi.Put("/:id",
-		auth.Authorized(auth.ParticipationsApiGroup, auth.UpdateSelfAction, h),
+		auth.Authorized(auth.ParticipationsApiGroup, auth.UpdateSelfAction, ParticipationPutActionHandler{}),
 		tracing.HandlerTracer("update-participation"),
 		updateParticipation,
 	)
@@ -42,21 +41,6 @@ func (h ParticipationRouteHandler) Register(app fiber.Router) {
 	)
 
 	log.Println("Registered participations api group.")
-}
-
-// Vote implement SelfActionHandler
-// Check that a user can do anything that relate to him.
-func (h ParticipationRouteHandler) Vote(ctx *fiber.Ctx, userId string, entityId string) bool {
-	requestId := ctx.Locals(internal.GetConfig().RequestIDKey).(string)
-	er := repository.NewParticipationRepository(requestId)
-
-	participation, err := er.FindOneById(entityId)
-	if err != nil {
-		return false
-	}
-
-	uId, _ := primitive.ObjectIDFromHex(userId)
-	return participation.Player == uId
 }
 
 // getParticipations godoc

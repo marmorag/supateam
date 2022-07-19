@@ -1,7 +1,7 @@
-FROM golang:1.16-alpine as builder
+FROM golang:1.18-alpine as builder
 # passed by buildkit
-ARG TARGETOS
-ARG TARGETARCH
+ARG TARGETOS=linux
+ARG TARGETARCH=amd64
 
 RUN apk --update add ca-certificates make git
 

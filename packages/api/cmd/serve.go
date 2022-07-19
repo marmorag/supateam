@@ -73,6 +73,7 @@ func executeServeCommand() {
 		handler.Register(api)
 	}
 
+	repository.GetMongoConnection()
 	defer repository.CloseConnection()
 	go interruptorFct(app)
 

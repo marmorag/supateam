@@ -19,14 +19,17 @@ func (EventRouteHandler) Register(app fiber.Router) {
 	eventsApi.Use(auth.Authenticated())
 
 	eventsApi.Get("/",
+		auth.Authorized(auth.EventsApiGroup, auth.ReadAction),
 		tracing.HandlerTracer("get-events"),
 		getEvents,
 	)
 	eventsApi.Get("/:id",
+		auth.Authorized(auth.EventsApiGroup, auth.ReadAction),
 		tracing.HandlerTracer("get-event"),
 		getEvent,
 	)
 	eventsApi.Get("/:id/participations",
+		auth.Authorized(auth.EventsApiGroup, auth.ReadAction),
 		tracing.HandlerTracer("get-event-participation"),
 		getEventParticipation,
 	)

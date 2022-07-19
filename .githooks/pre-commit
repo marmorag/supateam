@@ -19,6 +19,6 @@ else
     done
     echo "Done. ✓"
 
-    echo "Static Check.."
-    staticcheck ./packages/api/...
+#    echo "Static Check.."
+#    staticcheck ./packages/api/...
 fi

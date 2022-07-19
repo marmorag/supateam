@@ -10,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
+	"regexp"
 )
 
 type UserRouteHandler struct{}
@@ -53,6 +54,11 @@ func (s UserRouteHandler) Register(app fiber.Router) {
 // Check that a user can do anything that relate to him.
 func (UserRouteHandler) Vote(ctx *fiber.Ctx, userId string, entityId string) bool {
 	return userId == entityId
+}
+
+func (s UserRouteHandler) ExtractEntityId(ctx *fiber.Ctx) (string, error) {
+	rg := regexp.MustCompile(`([[:xdigit:]]{24})`)
+	return rg.FindString(ctx.Path()), nil
 }
 
 // getUsers godoc

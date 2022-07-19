@@ -11,17 +11,16 @@ import (
 )
 
 var connection *mongo.Client
-var connectionError error
-
-func init() {
-	connection, connectionError = getMongoConnection()
-
-	if connectionError != nil {
-		panic(connectionError)
-	}
-}
 
 func GetMongoConnection() *mongo.Client {
+	if connection == nil {
+		c, connectionError := getMongoConnection()
+		if connectionError != nil {
+			panic(connectionError)
+		}
+		connection = c
+	}
+
 	return connection
 }
 

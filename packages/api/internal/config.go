@@ -3,6 +3,7 @@ package internal
 import (
 	"fmt"
 	"github.com/joho/godotenv"
+	"log"
 	"os"
 	"strconv"
 )
@@ -40,7 +41,17 @@ func GetConfig() Configuration {
 }
 
 func InitConfig() {
-	_ = godotenv.Load(fmt.Sprintf(".env%s", getEnvExtension()))
+	if envPath := os.Getenv("APP_ENV_PATH"); envPath != "" {
+		err := godotenv.Load(envPath)
+		if err != nil {
+			log.Println("error while loading environment :", err)
+		}
+	} else {
+		err := godotenv.Load(fmt.Sprintf(".env%s", getEnvExtension()))
+		if err != nil {
+			log.Println("error while loading environment :", err)
+		}
+	}
 
 	dbPort, _ := strconv.Atoi(getEnv("DB_PORT", "27017"))
 
@@ -75,6 +86,10 @@ func getEnvExtension() string {
 	extension := ""
 	if env := os.Getenv("APP_ENV"); env == "prod" {
 		extension = ".prod"
+	}
+
+	if env := os.Getenv("APP_ENV"); env == "test" {
+		extension = ".test"
 	}
 
 	return extension

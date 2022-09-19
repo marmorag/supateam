@@ -1,3 +1,3 @@
 # SupaTeam
 
-Dashboard API to manage Wordpress projects hosted on Kubernetes.
+A calendar to help organize Golf team meeting.

@@ -18,6 +18,7 @@
 
       <v-btn v-if="canCreateEvent" class="mr-5" prepend-icon="mdi-calendar-plus" :to="{ name: 'create-event' }">évènement</v-btn>
       <v-btn class="mr-5" prepend-icon="mdi-calendar" :to="{ name: 'calendar' }">Calendrier</v-btn>
+      <v-btn class="mr-5" prepend-icon="mdi-account" :to="{ name: 'account' }">Mon Compte</v-btn>
       <v-divider inset vertical></v-divider>
       <v-btn class="mx-5" prepend-icon="mdi-logout" @click="handleDisconnect">Déconnexion</v-btn>
     </template>
@@ -31,11 +32,11 @@
 
   <v-navigation-drawer v-model="drawer" absolute :temporary="true">
     <v-list :nav="true" density="compact">
-        <v-list-item v-if="canCreateEvent" :to="{ name: 'create-event' }" @click="toggleDrawer">
+        <v-list-item :to="{ name: 'account' }" @click="toggleDrawer">
           <v-list-item-avatar>
-            <v-icon>mdi-calendar-plus</v-icon>
+            <v-icon>mdi-account</v-icon>
           </v-list-item-avatar>
-          <v-list-item-title>Évènements</v-list-item-title>
+          <v-list-item-title>Mon Compte</v-list-item-title>
         </v-list-item>
 
         <v-list-item :to="{ name: 'calendar' }" @click="toggleDrawer">
@@ -44,6 +45,15 @@
           </v-list-item-avatar>
           <v-list-item-title>Calendrier</v-list-item-title>
         </v-list-item>
+
+        <v-list-item v-if="canCreateEvent" :to="{ name: 'create-event' }" @click="toggleDrawer">
+          <v-list-item-avatar>
+            <v-icon>mdi-calendar-plus</v-icon>
+          </v-list-item-avatar>
+          <v-list-item-title>Évènements</v-list-item-title>
+        </v-list-item>
+
+        <v-divider />
 
         <v-list-item  @click="handleDisconnect">
           <v-list-item-avatar>

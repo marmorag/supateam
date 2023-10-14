@@ -2,6 +2,7 @@ import { createRouter, createWebHashHistory } from "vue-router";
 import LoginView from "../views/LoginView.vue";
 import CalendarView from "../views/CalendarView.vue";
 import EventView from "../views/event/EventView.vue";
+import AccountView from "../views/AccountView.vue";
 import CreateEventView from "../views/event/CreateEventView.vue";
 import UpdateEventView from "../views/event/UpdateEventView.vue";
 import AdminUsersView from "../views/admin/UsersView.vue";
@@ -38,6 +39,16 @@ const router = createRouter({
       component: CalendarView,
       meta: {
         title: "Calendrier",
+        requireAuthenticated: true,
+        requireAdmin: false,
+      },
+    },
+    {
+      name: "account",
+      path: "/account",
+      component: AccountView,
+      meta: {
+        title: "Mon Compte",
         requireAuthenticated: true,
         requireAdmin: false,
       },
